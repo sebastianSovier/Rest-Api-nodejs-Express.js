@@ -4,18 +4,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
+const AccountRoutes = require('./routes/accountController.js');
 
 
-app.use('/api/Paises', PaisesRoutes);
-
-/* Error handler middleware */
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  console.error(err.message, err.stack);
-  res.status(statusCode).json({'message': err.message});
-  return;
-});
-app.use('/api/Ciudades', CiudadesRoutes);
+app.use('/Account', AccountRoutes);
+app.use('/Countries', PaisesRoutes);
+app.use('/Ciudades', CiudadesRoutes);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

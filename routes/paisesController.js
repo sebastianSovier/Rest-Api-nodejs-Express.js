@@ -3,35 +3,35 @@ const router = express.Router();
 const paisesDal = require('../services/paisesDal');
 
 /* GET programming languages. */
-router.get('/', async function(req, res, next) {
+router.get('/TodosLosPaises', async function(req, res, next) {
   try {
-    res.json(await paisesDal.getMultiple(req.query.page));
+    res.json(await paisesDal.ObtenerPaises(req.query.page));
   } catch (err) {
-    console.error(`Error while getting programming languages `, err.message);
+    console.error(`Error al obtener paises: `, err.message);
     next(err);
   }
 });
-router.post('/', async function(req, res, next) {
+router.post('/IngresarPais', async function(req, res, next) {
   try {
-    res.json(await programmingLanguages.create(req.body));
+    res.json(await paisesDal.InsertarPais(req.body));
   } catch (err) {
-    console.error(`Error while creating programming language`, err.message);
+    console.error(`Error al insertar pais: `, err.message);
     next(err);
   }
 });
-router.put('/:id', async function(req, res, next) {
+router.put('/ModificarPais', async function(req, res, next) {
   try {
-    res.json(await programmingLanguages.update(req.params.id, req.body));
+    res.json(await paisesDal.ModificarPais(req.body.pais_id, req.body));
   } catch (err) {
-    console.error(`Error while updating programming language`, err.message);
+    console.error(`Error al modificar pais: `, err.message);
     next(err);
   }
 });
 router.delete('/:id', async function(req, res, next) {
   try {
-    res.json(await programmingLanguages.remove(req.params.id));
+    res.json(await paisesDal.EliminarPais(req.params.pais_id));
   } catch (err) {
-    console.error(`Error while deleting programming language`, err.message);
+    console.error(`Error al eliminar pais: `, err.message);
     next(err);
   }
 });

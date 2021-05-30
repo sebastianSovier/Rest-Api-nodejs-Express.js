@@ -2,7 +2,7 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 
-async function getMultiple(){
+async function ObtenerPaises(){
   const rows = await db.query(
     `SELECT pais_id, nombre_pais, capital, region, poblacion, fecha_registro 
     FROM Paises order by pais_id`
@@ -14,67 +14,65 @@ async function getMultiple(){
   }
 }
 
-async function create(programmingLanguage){
+async function InsertarPais(PaisRequest){
   const result = await db.query(
-    `INSERT INTO programming_languages 
-    (name, released_year, githut_rank, pypl_rank, tiobe_rank) 
+    `INSERT INTO Paises 
+    (nombre_pais, capital, region, poblacion) 
     VALUES 
-    (?, ?, ?, ?, ?)`, 
+    (?, ?, ?, ?)`, 
     [
-      programmingLanguage.name, programmingLanguage.released_year,
-      programmingLanguage.githut_rank, programmingLanguage.pypl_rank,
-      programmingLanguage.tiobe_rank
+      PaisRequest.nombre_pais, PaisRequest.capital,
+      PaisRequest.region, PaisRequest.poblacion
     ]
   );
 
-  let message = 'Error in creating programming language';
+  let message = 'Hubo error al Insertar pais';
 
   if (result.affectedRows) {
-    message = 'Programming language created successfully';
+    message = 'Se inserto pais correctamente';
   }
 
   return {message};
 }
-async function update(id, programmingLanguage){
+async function ModificarPais(pais_id, PaisRequest){
   const result = await db.query(
-    `UPDATE programming_languages 
-    SET name=?, released_year=?, githut_rank=?, 
-    pypl_rank=?, tiobe_rank=? 
-    WHERE id=?`, 
+    `UPDATE Paises 
+    SET nombre_pais=?, capital=?, region=?, 
+    poblacion=? 
+    WHERE pais_id=?`, 
     [
-      programmingLanguage.name, programmingLanguage.released_year,
-      programmingLanguage.githut_rank, programmingLanguage.pypl_rank,
-      programmingLanguage.tiobe_rank, id
+      PaisRequest.nombre_pais, PaisRequest.releascapitald_year,
+      PaisRequest.region, PaisRequest.poblacion, pais_id
     ]
   );
 
-  let message = 'Error in updating programming language';
+  let message = 'Error al modificar pais';
 
   if (result.affectedRows) {
-    message = 'Programming language updated successfully';
+    message = 'pais modificado correctamente';
   }
 
   return {message};
 }
 
-async function remove(id){
+async function EliminarPais(pais_id){
   const result = await db.query(
-    `DELETE FROM programming_languages WHERE id=?`, 
-    [id]
+    `DELETE FROM Paises WHERE pais_id=?`, 
+    [pais_id]
   );
 
-  let message = 'Error in deleting programming language';
+  let message = 'Error al eliminar pais';
 
   if (result.affectedRows) {
-    message = 'Programming language deleted successfully';
+    message = 'Pais eliminado correctamente';
   }
 
   return {message};
 }
 
 module.exports = {
-  getMultiple,
-  create,
-  update,
-  remove
+  ObtenerPaises,
+  InsertarPais,
+  ModificarPais,
+  EliminarPais
 }
