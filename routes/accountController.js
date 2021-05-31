@@ -62,9 +62,19 @@ router.post('/Login', urlencodedParser, function (req, res) {
     }
 });
 
-router.post('/IngresarUsuario',helper.verifyToken, async function (req, res, next) {
+router.post('/IngresarUsuario', async function (req, res, next) {
     try {
-        res.json(await usuarioDal.CrearUsuario(req.body));
+        await usuarioDal.CrearUsuario(req.body).then(function (result) {
+            try {
+                return res.status(200).send({ datos: "ok" });
+            } catch (error) {
+                console.log(error);
+                return res.status(400).send({ datos: { Error: "error al crear usuario" } });
+            }
+        }).catch(function (error) {
+            console.log(error);
+        }).finally(function () {
+        });
     } catch (err) {
         console.error(`Error al insertar usuario: `, err.message);
         next(err);
