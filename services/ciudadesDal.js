@@ -2,10 +2,11 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 
-async function ObtenerCiudades() {
+async function ObtenerCiudades(pais_id) {
     const rows = await db.query(
         `SELECT ciudad_id, pais_id, nombre_ciudad, poblacion, region, fecha_registro, latitud, longitud
-    FROM Ciudades where pais_id = ? order by pais_id`
+    FROM Ciudades where pais_id = ? order by pais_id`,
+    [pais_id]
     );
     const data = helper.emptyOrRows(rows);
 
