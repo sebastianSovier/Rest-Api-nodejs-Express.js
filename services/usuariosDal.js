@@ -16,12 +16,12 @@ async function ObtenerUsuarios(){
 
 async function ObtenerUsuario(usuario_id){
     const rows = await db.query(
-        `SELECT usuario_id, usuario, nombre_completo, correo, fecha_registro 
-        FROM Usuarios where usuario_id = ? order by usuario_id`,
+        `SELECT usuario_id, usuario, nombre_completo,contrasena, correo, fecha_registro 
+        FROM Usuarios where usuario = ? order by usuario_id`,
         [usuario_id]
     );
     const data = helper.emptyOrRows(rows);
-  
+      console.log("Data"+data);
     return {
       data
     }

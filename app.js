@@ -6,6 +6,11 @@ const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.use('/Account', AccountRoutes);
 app.use('/Countries', PaisesRoutes);

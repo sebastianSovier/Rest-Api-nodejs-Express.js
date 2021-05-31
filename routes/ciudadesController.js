@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const ciudadesDal = require('../services/ciudadesDal');
+const helper = require('../helper');
 
 /* GET programming languages. */
-router.get('/CiudadesPais', async function(req, res, next) {
+router.get('/CiudadesPais',helper.verifyToken,async function(req, res, next) {
   try {
     res.json(await ciudadesDal.ObtenerCiudades());
   } catch (err) {
@@ -11,7 +12,7 @@ router.get('/CiudadesPais', async function(req, res, next) {
     next(err);
   }
 });
-router.post('/IngresarCiudad', async function(req, res, next) {
+router.post('/IngresarCiudad',helper.verifyToken, async function(req, res, next) {
   try {
     res.json(await ciudadesDal.InsertarCiudad(req.body));
   } catch (err) {
@@ -19,7 +20,7 @@ router.post('/IngresarCiudad', async function(req, res, next) {
     next(err);
   }
 });
-router.put('/ModificarCiudad', async function(req, res, next) {
+router.put('/ModificarCiudad',helper.verifyToken, async function(req, res, next) {
   try {
     res.json(await ciudadesDal.ModificarCiudad(req.body.pais_id, req.body));
   } catch (err) {
@@ -27,7 +28,7 @@ router.put('/ModificarCiudad', async function(req, res, next) {
     next(err);
   }
 });
-router.delete('/:id', async function(req, res, next) {
+router.delete('/:id',helper.verifyToken, async function(req, res, next) {
   try {
     res.json(await ciudadesDal.EliminarCiudad(req.params.pais_id));
   } catch (err) {
@@ -35,5 +36,7 @@ router.delete('/:id', async function(req, res, next) {
     next(err);
   }
 });
+
+
 
 module.exports = router;
