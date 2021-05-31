@@ -41,7 +41,7 @@ async function ModificarPais(pais_id, PaisRequest){
     poblacion=? 
     WHERE pais_id=?`, 
     [
-      PaisRequest.nombre_pais, PaisRequest.releascapitald_year,
+      PaisRequest.nombre_pais, PaisRequest.capital,
       PaisRequest.region, PaisRequest.poblacion, pais_id
     ]
   );

@@ -14,28 +14,18 @@ router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) 
 });
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
   try {
-    res.json(await ciudadesDal.InsertarCiudad(req.body));
-  } catch (err) {
-    console.error(`Error al insertar ciudad: `, err.message);
-    next(err);
-  }
-});
-router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, next) {
-  try {
-    ciudadesDal.ModificarCiudad(req.body);
-    await usuarioDal.ObtenerUsuario(req.body.Username).then(function (result) {
+    ciudadesDal.InsertarCiudad(req.body).then(function (result) {
       try {
-        console.log("result:" + result.data[0].contrasena);
-        if (req.body.Password === req.body.Password) {
-          console.log(result);
-          var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
-            expiresIn: "1h"
-          });
-          global.token = token;
-          return res.status(200).send({ auth: true, access_Token: token });
-        } else {
-          return res.status(401).send({ auth: false, mensaje: "acceso no autorizado" });
-        }
+        await ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
+          try {
+            return res.json(result);
+          } catch (error) {
+            console.log(error);
+          }
+        }).catch(function (error) {
+          console.log(error);
+        }).finally(function () {
+        });
       } catch (error) {
         console.log(error);
       }
@@ -43,20 +33,65 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
       console.log(error);
     }).finally(function () {
     });
+
+  } catch (err) {
+    console.error(`Error al insertar ciudad: `, err.message);
+    next(err);
+  }
+});
+router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, next) {
+  try {
+    ciudadesDal.ModificarCiudad(req.body).then(function (result) {
+      try {
+        await ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
+          try {
+            return res.json(result);
+          } catch (error) {
+            console.log(error);
+          }
+        }).catch(function (error) {
+          console.log(error);
+        }).finally(function () {
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }).catch(function (error) {
+      console.log(error);
+    }).finally(function () {
+    });
+
   } catch (err) {
     console.error(`Error al modificar ciudad: `, err.message);
     next(err);
   }
 });
-router.delete('/:id', helper.verifyToken, async function (req, res, next) {
+router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, next) {
   try {
-    res.json(await ciudadesDal.EliminarCiudad(req.params.pais_id));
+    ciudadesDal.EliminarCiudad(req.query.pais_id).then(function (result) {
+      try {
+        await ciudadesDal.ObtenerCiudades(req.query.pais_id).then(function (result) {
+          try {
+            return res.json(result);
+          } catch (error) {
+            console.log(error);
+          }
+        }).catch(function (error) {
+          console.log(error);
+        }).finally(function () {
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }).catch(function (error) {
+      console.log(error);
+    }).finally(function () {
+    });
+
   } catch (err) {
     console.error(`Error al eliminar ciudad: `, err.message);
     next(err);
   }
 });
-
-
 
 module.exports = router;
