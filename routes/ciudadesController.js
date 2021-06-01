@@ -16,7 +16,7 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
   try {
     ciudadesDal.InsertarCiudad(req.body).then(function (result) {
       try {
-        await ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
+         ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
           try {
             return res.json(result);
           } catch (error) {
@@ -43,7 +43,7 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
   try {
     ciudadesDal.ModificarCiudad(req.body).then(function (result) {
       try {
-        await ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
+         ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
           try {
             return res.json(result);
           } catch (error) {
@@ -68,9 +68,9 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
 });
 router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, next) {
   try {
-    ciudadesDal.EliminarCiudad(req.query.pais_id).then(function (result) {
+    ciudadesDal.EliminarCiudad(req.query.ciudad_id).then(function (result) {
       try {
-        await ciudadesDal.ObtenerCiudades(req.query.pais_id).then(function (result) {
+         ciudadesDal.ObtenerCiudades(req.query.pais_id).then(function (result) {
           try {
             return res.json(result);
           } catch (error) {

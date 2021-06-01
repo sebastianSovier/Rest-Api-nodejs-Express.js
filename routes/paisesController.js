@@ -16,7 +16,7 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
   try {
     paisesDal.InsertarPais(req.body).then(function (result) {
       try {
-        await paisesDal.ObtenerPaises().then(function (result) {
+         paisesDal.ObtenerPaises().then(function (result) {
           try {
             return res.json(result);
           } catch (error) {
@@ -44,7 +44,7 @@ router.put('/ModificarPais', helper.verifyToken, async function (req, res, next)
     console.log("modificar pais: " + JSON.stringify(req.body));
     paisesDal.ModificarPais(req.body.pais_id, req.body).then(function (result) {
       try {
-        await paisesDal.ObtenerPaises().then(function (result) {
+         paisesDal.ObtenerPaises().then(function (result) {
           try {
             return res.json(result);
           } catch (error) {
@@ -71,7 +71,7 @@ router.delete('/EliminarPais', helper.verifyToken, async function (req, res, nex
   try {
     paisesDal.EliminarPais(req.query.pais_id).then(function (result) {
       try {
-        await paisesDal.ObtenerPaises().then(function (result) {
+         paisesDal.ObtenerPaises().then(function (result) {
           try {
             return res.json(result);
           } catch (error) {
