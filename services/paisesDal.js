@@ -2,10 +2,13 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 
-async function ObtenerPaises(){
+async function ObtenerPaises(usuario_id){
   const rows = await db.query(
     `SELECT pais_id, nombre_pais, capital, region, poblacion, fecha_registro 
-    FROM Paises order by pais_id`
+    FROM Paises where usuario_id = ? order by pais_id`,
+    [
+      usuario_id
+    ]
   );
   const data = helper.emptyOrRows(rows);
 
@@ -17,12 +20,12 @@ async function ObtenerPaises(){
 async function InsertarPais(PaisRequest){
   const result = await db.query(
     `INSERT INTO Paises 
-    (nombre_pais, capital, region, poblacion) 
+    (nombre_pais, capital, region, poblacion,usuario_id) 
     VALUES 
-    (?, ?, ?, ?)`, 
+    (?, ?, ?, ?, ?)`, 
     [
       PaisRequest.nombre_pais, PaisRequest.capital,
-      PaisRequest.region, PaisRequest.poblacion
+      PaisRequest.region, PaisRequest.poblacion,PaisRequest.usuario_id
     ]
   );
 

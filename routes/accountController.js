@@ -37,16 +37,24 @@ router.post('/Login', urlencodedParser, function (req, res) {
         // create a token
         usuarioDal.ObtenerUsuario(req.body.Username).then(function (result) {
             try {
-                console.log("result:" + result.data[0].contrasena);
-                if (req.body.Password === req.body.Password) {
+                console.log(result);
+                console.log(result.data.length);
+               
+                if (result.data.length > 0) {
+                    console.log(result.data[0].contrasena);
+                    if(req.body.Password === result.data[0].contrasena){
+                    console.log("result:" + result.data[0].contrasena);
                     console.log(result);
                     var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
                         expiresIn: "1h"
                     });
                     global.token = token;
                     return res.status(200).send({ auth: true, access_Token: token });
+                }else{
+                    return res.status(200).send({Error:"98", auth: false, mensaje: "usuario no existe" });
+                }
                 } else {
-                    return res.status(401).send({ auth: false, mensaje: "acceso no autorizado" });
+                    return res.status(200).send({Error:"98", auth: false, mensaje: "usuario no existe" });
                 }
             } catch (error) {
                 console.log(error);
