@@ -48,7 +48,7 @@ router.post('/Login', urlencodedParser, function (req, res) {
                     var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
                         expiresIn: "1h"
                     });
-                    global.token = token;
+                    //global.token = token;
                     return res.status(200).send({ auth: true, access_Token: token });
                 }else{
                     return res.status(200).send({Error:"98", auth: false, mensaje: "usuario no existe" });
