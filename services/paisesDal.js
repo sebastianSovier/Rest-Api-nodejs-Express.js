@@ -2,10 +2,9 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 
+
 async function ObtenerPaises(usuario_id){
-  const rows = await db.query(
-    `SELECT pais_id, nombre_pais, capital, region, poblacion, fecha_registro 
-    FROM Paises where usuario_id = ? order by pais_id`,
+  const rows = await db.query('call p_listar_paises(?)',
     [
       usuario_id
     ]
