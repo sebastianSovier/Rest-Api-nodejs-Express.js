@@ -6,12 +6,14 @@ const helper = require('../helper');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 /* GET programming languages. */
+/*
 var cors = require('cors');
 var corsOptions = {
   origin: 'http://localhost:4200',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 router.use(cors(corsOptions));
+*/
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {

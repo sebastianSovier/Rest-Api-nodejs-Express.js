@@ -11,7 +11,12 @@ const AccountRoutes = require('./routes/accountController.js');
   origin: 'http://yourapp.com'
 }));*/
 // parse application/x-www-form-urlencoded
-app.use(cors());
+var cors = require('cors');
+var corsOptions = {
+  origin: 'http://localhost:4200',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json

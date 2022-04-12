@@ -5,14 +5,14 @@ var jwt = require('jsonwebtoken');
 var config = require('../config');
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-
+/*
 var cors = require('cors');
 var corsOptions = {
   origin: 'http://localhost:4200',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 router.use(cors(corsOptions));
-
+*/
 router.get('/ObtenerUsuarios', async function (req, res, next) {
     try {
         res.json(await usuarioDal.ObtenerUsuarios());
