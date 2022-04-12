@@ -3,7 +3,7 @@ const helper = require('../helper');
 const config = require('../config');
 
 
-async function ObtenerPaises(usuario_id){
+async function ObtenerPaises(usuario_id) {
   const rows = await db.query('call p_listar_paises(?)',
     [
       usuario_id
@@ -16,15 +16,15 @@ async function ObtenerPaises(usuario_id){
   }
 }
 
-async function InsertarPais(PaisRequest){
+async function InsertarPais(PaisRequest) {
   const result = await db.query(
     `INSERT INTO Paises 
     (nombre_pais, capital, region, poblacion,usuario_id) 
     VALUES 
-    (?, ?, ?, ?, ?)`, 
+    (?, ?, ?, ?, ?)`,
     [
       PaisRequest.nombre_pais, PaisRequest.capital,
-      PaisRequest.region, PaisRequest.poblacion,PaisRequest.usuario_id
+      PaisRequest.region, PaisRequest.poblacion, PaisRequest.usuario_id
     ]
   );
 
@@ -34,14 +34,14 @@ async function InsertarPais(PaisRequest){
     message = 'Se inserto pais correctamente';
   }
 
-  return {message};
+  return { message };
 }
-async function ModificarPais(pais_id, PaisRequest){
+async function ModificarPais(pais_id, PaisRequest) {
   const result = await db.query(
     `UPDATE Paises 
     SET nombre_pais=?, capital=?, region=?, 
     poblacion=? 
-    WHERE pais_id=?`, 
+    WHERE pais_id=?`,
     [
       PaisRequest.nombre_pais, PaisRequest.capital,
       PaisRequest.region, PaisRequest.poblacion, pais_id
@@ -54,12 +54,12 @@ async function ModificarPais(pais_id, PaisRequest){
     message = 'pais modificado correctamente';
   }
 
-  return {message};
+  return { message };
 }
 
-async function EliminarPais(pais_id){
+async function EliminarPais(pais_id) {
   const result = await db.query(
-    `DELETE FROM Paises WHERE pais_id=?`, 
+    `DELETE FROM Paises WHERE pais_id=?`,
     [pais_id]
   );
 
@@ -69,7 +69,7 @@ async function EliminarPais(pais_id){
     message = 'Pais eliminado correctamente';
   }
 
-  return {message};
+  return { message };
 }
 
 module.exports = {
