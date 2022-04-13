@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
-
+const path = require("path");
 /*app.use(cors({
   origin: 'http://yourapp.com'
 }));*/
@@ -18,7 +18,7 @@ var corsOptions = {
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }))
-
+app.use(express.static(path.join(__dirname, "files")));
 // parse application/json
 app.use(bodyParser.json())
 

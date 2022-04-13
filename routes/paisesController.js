@@ -5,6 +5,7 @@ const usuariosDal = require('../services/usuariosDal');
 const helper = require('../helper');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
+const ExcelJS = require('exceljs');
 /* GET programming languages. */
 /*
 var cors = require('cors');
@@ -14,6 +15,7 @@ var corsOptions = {
 }
 router.use(cors(corsOptions));
 */
+
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
@@ -24,8 +26,38 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
         console.log(result);
         if (result.data.length > 0) {
           paisesDal.ObtenerPaises(result.data[0].usuario_id).then(function (result) {
-
             return res.json(result);
+
+          }).catch(function (error) {
+            console.log(error);
+          }).finally(function () {
+          });
+        }
+      }).catch(function (error) {
+        console.log(error);
+      }).finally(function () {
+      });
+    }
+  });
+
+});
+router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next) {
+  jwt.verify(req.token, config.secret, (err, authdata) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      console.log(authdata);
+      usuariosDal.ObtenerUsuario(req.query.usuario).then(function (result) {
+        console.log(result);
+        if (result.data.length > 0) {
+          paisesDal.ObtenerPaises(result.data[0].usuario_id).then(function (result) {
+            var outputData = result.data[0].map(Object.values);
+            const workbook = helper.exportXlsx(outputData);
+            workbook.xlsx.writeBuffer().then(function (result) {
+              console.log(result);
+              var string64 = result.toString('base64');
+              res.json(string64);
+            });
           }).catch(function (error) {
             console.log(error);
           }).finally(function () {
