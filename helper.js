@@ -58,41 +58,9 @@ function exportXlsx(array) {
 
 }
 
-async function sendWorkbook(res) {
-  try {
-    var fileName = 'FileName.xlsx';
-    const workbook = helper.exportXlsx();
-    console.log(workbook);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=" + "tutorials.xlsx"
-    );
-    const data = workbook.xlsx.writeFile(`./users.xlsx`)
-      .then(() => {
-        res.send({
-          status: "success",
-          message: "file successfully downloaded",
-          path: `./users.xlsx`,
-        });
-      });
-  } catch (err) {
-    res.send({
-      status: "error",
-      message: "Something went wrong",
-    });
-  }
-}
-
 module.exports = {
   getOffset,
   emptyOrRows,
   verifyToken,
-  exportXlsx,
-  sendWorkbook
+  exportXlsx
 }

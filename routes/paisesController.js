@@ -5,7 +5,6 @@ const usuariosDal = require('../services/usuariosDal');
 const helper = require('../helper');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
-const ExcelJS = require('exceljs');
 /* GET programming languages. */
 /*
 var cors = require('cors');
