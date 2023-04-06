@@ -15,7 +15,18 @@ async function ObtenerPaises(usuario_id) {
     data
   }
 }
+async function ObtenerPaisesPorFechas(p_fecha_desde,p_fecha_hasta,p_usuario_id) {
+  const rows = await db.query('call p_buscar_paises(?,?,?)',
+    [
+      p_fecha_desde,p_fecha_hasta,p_usuario_id
+    ]
+  );
+  const data = helper.emptyOrRows(rows);
 
+  return {
+    data
+  }
+}
 async function InsertarPais(PaisRequest) {
   const result = await db.query(
     `INSERT INTO Paises 
@@ -76,5 +87,6 @@ module.exports = {
   ObtenerPaises,
   InsertarPais,
   ModificarPais,
-  EliminarPais
+  EliminarPais,
+  ObtenerPaisesPorFechas
 }

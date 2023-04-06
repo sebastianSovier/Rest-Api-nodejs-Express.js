@@ -29,10 +29,7 @@ async function ObtenerUsuario(usuario_id){
 
 async function CrearUsuario(UsuarioRequest){
   const result = await db.query(
-    `INSERT INTO Usuarios 
-    (usuario, contrasena, nombre_completo, correo) 
-    VALUES 
-    (?, ?, ?, ?)`, 
+    `call p_crear_usuario(?,?,?,?)`, 
     [
         UsuarioRequest.usuario, UsuarioRequest.contrasena,
         UsuarioRequest.nombre_completo, UsuarioRequest.correo

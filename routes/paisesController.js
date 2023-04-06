@@ -38,6 +38,32 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
       });
     }
   });
+});
+router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, res, next) {
+  jwt.verify(req.token, config.secret, (err, authdata) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      usuariosDal.ObtenerUsuario(req.body.usuario).then(function (result) {
+        if (result.data.length > 0) {
+
+          console.log(result.data[0]);
+          req.body.usuario_id = result.data[0].usuario_id;
+          console.log(req.body);
+          paisesDal.ObtenerPaisesPorFechas(req.body.fecha_desde, req.body.fecha_hasta, req.body.usuario_id).then(function (result) {
+            return res.json(result);
+
+          }).catch(function (error) {
+            console.log(error);
+          }).finally(function () {
+          });
+        }
+      }).catch(function (error) {
+        console.log(error);
+      }).finally(function () {
+      });
+    }
+  });
 
 });
 router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next) {

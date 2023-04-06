@@ -14,7 +14,7 @@ const path = require("path");
 var cors = require('cors');
 var corsOptions = {
   origin: 'http://localhost:4200',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200 || 204// some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }))
