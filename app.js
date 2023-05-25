@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 var cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
@@ -13,7 +13,7 @@ const path = require("path");
 // parse application/x-www-form-urlencoded
 var cors = require('cors');
 var corsOptions = {
-  origin: 'http://localhost:4200',
+  origin: ['http://18.218.31.115','http://ec2-18-218-31-115.us-east-2.compute.amazonaws.com'],
   optionsSuccessStatus: 200 || 204// some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
