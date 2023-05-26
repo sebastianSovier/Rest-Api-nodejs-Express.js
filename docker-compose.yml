@@ -1,14 +1,14 @@
-version: '1'
+version: '3'
 
 services:
     web:
-        container_name: node_restapi
+        container_name: node-mysqlapi
         restart: always
-        build: .
         ports:
             - "80:80"
         links:
             - "mysql"
+        image: secros18/node-restapi
 
     mysql:
         container_name: mysql
