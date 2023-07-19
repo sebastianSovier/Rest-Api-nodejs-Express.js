@@ -2,9 +2,9 @@ const env = process.env;
 
 const config = {
   db: { 
-    host: env.DB_HOST || '3.139.87.179',
+    host: env.DB_HOST || '18.117.196.27',
     user: env.DB_USER || 'secros',
-    port:env.port || 33060,
+    port:env.port || 3306,
     password: env.DB_PASSWORD || 'sovier',
     database: env.DB_NAME || 'bdpaises',
   },

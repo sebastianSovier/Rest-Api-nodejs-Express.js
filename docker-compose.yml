@@ -1,15 +1,20 @@
 version: '3'
 
 services:
-    web:
+    api:
         container_name: node-mysqlapi
         restart: always
         ports:
-            - "80:80"
+            - "8080:8080"
         links:
             - "mysql"
         image: secros18/node-restapi
-
+        
+    web:
+        container_name: angular-nodeapp
+        ports:
+            - "80:80"
+        image: secros18/angular-app
     mysql:
         container_name: mysql
         environment:
