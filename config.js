@@ -2,10 +2,10 @@ const env = process.env;
 
 const config = {
   db: { 
-    host: env.DB_HOST || '18.117.196.27',
-    user: env.DB_USER || 'secros',
-    port:env.port || 3306,
-    password: env.DB_PASSWORD || 'sovier',
+    host: env.DB_HOST || 'localhost',
+    user: env.DB_USER || 'root',
+    port:env.port || 3308,
+    password: env.DB_PASSWORD || 'sebsov15',
     database: env.DB_NAME || 'bdpaises',
   },
   listPerPage: env.LIST_PER_PAGE || 10,

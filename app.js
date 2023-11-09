@@ -13,7 +13,7 @@ const path = require("path");
 // parse application/x-www-form-urlencoded
 var cors = require('cors');
 var corsOptions = {
-  origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com'],
+  origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://localhost:4200'],
   optionsSuccessStatus: 200 || 204// some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
