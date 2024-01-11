@@ -17,6 +17,7 @@ router.use(cors(corsOptions));
 
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
+   
     if (err) {
       res.sendStatus(403);
     } else {

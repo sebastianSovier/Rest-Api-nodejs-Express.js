@@ -5,6 +5,11 @@ var jwt = require('jsonwebtoken');
 var config = require('../config');
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
+const someOtherPlaintextPassword = 'not_bacon';
 /*
 var cors = require('cors');
 var corsOptions = {
@@ -44,20 +49,21 @@ router.post('/Login', urlencodedParser, function (req, res) {
         console.log(result.data.length);
 
         if (result.data.length > 0) {
-            console.log(result.data[0].contrasena);
-            if (req.body.Password === result.data[0].contrasena) {
-                console.log("result:" + result.data[0].contrasena);
-                console.log(result);
-                var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
-                    expiresIn: "1h"
-                });
-                //global.token = token;
-                return res.status(200).send({ auth: true, access_Token: token });
-            } else {
-                return res.status(200).send({ Error: "98", auth: false, mensaje: "usuario no existe" });
-            }
-        } else {
-            return res.status(200).send({ Error: "98", auth: false, mensaje: "usuario no existe" });
+            console.log(result.data[0].contrasena)
+            bcrypt.compare(req.body.Password, result.data[0].contrasena, function(err, resultBcrypt) {
+                console.log(err)
+                console.log(resultBcrypt)
+                if(resultBcrypt){
+                    console.log(result.data[0].contrasena)
+                    var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
+                        expiresIn: "1h"
+                    });
+                    //global.token = token;
+                    return res.status(200).send({ auth: true, access_Token: token });
+                }else{
+                    return res.status(200).send({ Error: "98", auth: false, mensaje: "contrasena incorrecta" });
+                }
+            });
         }
     }).catch(function (error) {
         console.log(error);
@@ -67,18 +73,22 @@ router.post('/Login', urlencodedParser, function (req, res) {
 });
 
 router.post('/IngresarUsuario', async function (req, res, next) {
-    await usuarioDal.CrearUsuario(req.body).then(function (result) {
-        try {
-            return res.status(200).send({ datos: "ok" });
-        } catch (error) {
-            console.log(error);
-            return res.status(400).send({ datos: { Error: "error al crear usuario" } });
-        }
-    }).catch(function (error) {
-        console.log(error);
-        return res.status(400).send({ datos: { Error: "hubo un problema" } });
-    }).finally(function () {
-    });
+     bcrypt.genSalt(saltRounds, function(err, salt) {
+        bcrypt.hash(req.body.contrasena, salt, function(err, hash) {
+            req.body.contrasena = hash;
+             usuarioDal.CrearUsuario(req.body).then(function (result) {
+                try {
+                    return res.status(200).send({ datos: "ok" });
+                } catch (error) {
+                    console.log(error);
+                    return res.status(400).send({ datos: { Error: "error al crear usuario" } });
+                }
+            }).catch(function (error) {
+                console.log(error);
+                return res.status(400).send({ datos: { Error: "hubo un problema" } });
+            });
+        });
+    })
 });
 
 module.exports = router;
