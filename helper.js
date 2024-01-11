@@ -1,8 +1,19 @@
 
 const ExcelJS = require('exceljs');
-
+const CryptoJS = require("crypto-js");
+const config = require("./config");
 function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage];
+}
+
+function encrypt(data){
+  var resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
+  return resp;
+}
+function decrypt(data){
+  var bytes  = CryptoJS.AES.decrypt(data,config.secret);
+  var resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  return resp;
 }
 
 function emptyOrRows(rows) {
@@ -62,5 +73,7 @@ module.exports = {
   getOffset,
   emptyOrRows,
   verifyToken,
-  exportXlsx
+  exportXlsx,
+  encrypt,
+  decrypt
 }
