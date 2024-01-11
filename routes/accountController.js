@@ -56,7 +56,7 @@ router.post('/Login', urlencodedParser, function (req, res) {
                 if(resultBcrypt){
                     console.log(result.data[0].contrasena)
                     var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
-                        expiresIn: "1h"
+                        expiresIn: "5m"
                     });
                     //global.token = token;
                     return res.status(200).send({ auth: true, access_Token: token });
