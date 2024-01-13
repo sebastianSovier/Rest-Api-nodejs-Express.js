@@ -4,32 +4,39 @@ const ciudadesDal = require('../services/ciudadesDal');
 const helper = require('../helper');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
-/* GET programming languages. */
 
-/*
-var cors = require('cors');
-var corsOptions = {
-  origin: 'http://localhost:4200',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-router.use(cors(corsOptions));
-*/
+
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
       res.sendStatus(403);
     }
   });
-  res.json(await ciudadesDal.ObtenerCiudades(req.query.pais_id));
+  const request = helper.decryptQuery(req.query.data);
+  console.log(request);
+  ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
+    console.log("resultCiudades")
+    console.log(resultCiudades)
+
+      return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
+    
+  }).catch(function (error) {
+    console.log(error);
+  }).finally(function () {
+  });
+
 });
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
       res.sendStatus(403);
     } else {
-      ciudadesDal.InsertarCiudad(req.body).then(function (result) {
-        ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
-          return res.json(result);
+      const request = helper.decrypt(req.body.data);
+      ciudadesDal.InsertarCiudad(request).then(function (result) {
+        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
+          console.log(resultCiudades)
+          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
+          
         }).catch(function (error) {
           console.log(error);
         }).finally(function () {
@@ -46,9 +53,13 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
     if (err) {
       res.sendStatus(403);
     } else {
-      ciudadesDal.ModificarCiudad(req.body).then(function (result) {
-        ciudadesDal.ObtenerCiudades(req.body.pais_id).then(function (result) {
-          return res.json(result);
+      const request = helper.decrypt(req.body.data);
+      console.log("request")
+      console.log(request)
+      ciudadesDal.ModificarCiudad(request).then(function (result) {
+        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
+          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
+
         }).catch(function (error) {
           console.log(error);
         }).finally(function () {
@@ -65,9 +76,12 @@ router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, n
     if (err) {
       res.sendStatus(403);
     } else {
-      ciudadesDal.EliminarCiudad(req.query.ciudad_id).then(function (result) {
-        ciudadesDal.ObtenerCiudades(req.query.pais_id).then(function (result) {
-          return res.json(result);
+      const request = helper.decryptQuery(req.query.data);
+      ciudadesDal.EliminarCiudad(request.ciudad_id).then(function (result) {
+        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
+          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
+          
+
         }).catch(function (error) {
           console.log(error);
         }).finally(function () {

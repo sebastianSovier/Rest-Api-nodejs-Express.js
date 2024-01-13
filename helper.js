@@ -15,6 +15,19 @@ function decrypt(data){
   var resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   return resp;
 }
+function decryptQuery(data){
+  const r1 = new RegExp("/", 'g')
+  const r2 = new RegExp("'", 'g')
+  const r3 = new RegExp("=", 'g')
+  const r4 = new RegExp("&", 'g')
+  console.log("data: "+data);
+  var bytes  = CryptoJS.AES.decrypt(data.toString(), config.secret);
+  var originalText = bytes.toString(CryptoJS.enc.Utf8);
+  console.log("originalText: "+originalText);
+  var resp = originalText.replace(r3,":").replace(r4,",").trimStart('"').trimEnd('"').replace(r1,"").replace(r2,'"');
+  console.log(JSON.parse("{"+resp+"}"));
+  return JSON.parse("{"+resp+"}");
+}
 
 function emptyOrRows(rows) {
   if (!rows) {
@@ -75,5 +88,6 @@ module.exports = {
   verifyToken,
   exportXlsx,
   encrypt,
-  decrypt
+  decrypt,
+  decryptQuery
 }

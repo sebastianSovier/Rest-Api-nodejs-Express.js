@@ -15,6 +15,7 @@ async function ObtenerUsuarios(){
 }
 
 async function ObtenerUsuario(usuario_id){
+  console.log("usuario_id: "+usuario_id)
     const rows = await db.query(
         `SELECT usuario_id, usuario, nombre_completo,contrasena, correo, fecha_registro 
         FROM usuarios where usuario = ? order by usuario_id`,

@@ -9,17 +9,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-var CryptoJS = require("crypto-js");
 
-
-/*
-var cors = require('cors');
-var corsOptions = {
-  origin: 'http://localhost:4200',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
-router.use(cors(corsOptions));
-*/
 
 router.get('/ObtenerUsuarios', async function (req, res, next) {
     try {
@@ -52,7 +42,6 @@ router.post('/Login', urlencodedParser, function (req, res) {
     usuarioDal.ObtenerUsuario(request.Username).then(function (result) {
         console.log(result);
         console.log(result.data.length);
-
         if (result.data.length > 0) {
             console.log(result.data[0].contrasena)
             bcrypt.compare(request.Password, result.data[0].contrasena, function(err, resultBcrypt) {
@@ -79,10 +68,12 @@ router.post('/Login', urlencodedParser, function (req, res) {
 });
 
 router.post('/IngresarUsuario', async function (req, res, next) {
+    console.log(helper.decrypt(req.body.data))
+    const request = helper.decrypt(req.body.data);
      bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(req.body.contrasena, salt, function(err, hash) {
-            req.body.contrasena = hash;
-             usuarioDal.CrearUsuario(req.body).then(function (result) {
+        bcrypt.hash(request.contrasena, salt, function(err, hash) {
+            request.contrasena = hash;
+             usuarioDal.CrearUsuario(request).then(function (result) {
                 try {
                     return res.status(200).send({ datos: "ok" });
                 } catch (error) {
