@@ -22,6 +22,8 @@ router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) 
     
   }).catch(function (error) {
     console.log(error);
+    return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
   }).finally(function () {
   });
 
@@ -35,14 +37,12 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
       ciudadesDal.InsertarCiudad(request).then(function (result) {
         ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
           console.log(resultCiudades)
-          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
-          
-        }).catch(function (error) {
-          console.log(error);
-        }).finally(function () {
-        });
+          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});    
+        })
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }
@@ -60,12 +60,11 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
         ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
           return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
 
-        }).catch(function (error) {
-          console.log(error);
-        }).finally(function () {
         });
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }
@@ -82,12 +81,11 @@ router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, n
           return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
           
 
-        }).catch(function (error) {
-          console.log(error);
-        }).finally(function () {
-        });
+        })
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }

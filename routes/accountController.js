@@ -10,25 +10,6 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-
-router.get('/ObtenerUsuarios', async function (req, res, next) {
-    try {
-        const resp = await usuarioDal.ObtenerUsuarios()
-        res.status(200).send( helper.encrypt(JSON.stringify(resp)));
-    } catch (err) {
-        console.error(`Error al obtener usuarios: `, err.message);
-        next(err);
-    }
-});
-
-router.get('/', async function (req, res, next) {
-    try {
-        res.json(await usuarioDal.ObtenerUsuario());
-    } catch (err) {
-        console.error(`Error al obtener usuario: `, err.message);
-        next(err);
-    }
-});
 router.post('/Login', urlencodedParser, function (req, res) {
     err = "";
     console.log(req.body);
@@ -47,7 +28,7 @@ router.post('/Login', urlencodedParser, function (req, res) {
             bcrypt.compare(request.Password, result.data[0].contrasena, function(err, resultBcrypt) {
                 console.log(err)
                 console.log(resultBcrypt)
-                if(resultBcrypt){
+                if(resultBcrypt == true){
                     console.log(result.data[0].contrasena)
                     var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
                         expiresIn: "5m"
@@ -75,14 +56,14 @@ router.post('/IngresarUsuario', async function (req, res, next) {
             request.contrasena = hash;
              usuarioDal.CrearUsuario(request).then(function (result) {
                 try {
-                    return res.status(200).send({ datos: "ok" });
+                    return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: "ok" }))});
                 } catch (error) {
                     console.log(error);
-                    return res.status(400).send({ datos: { Error: "error al crear usuario" } });
+                    return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "error al crear usuario" } }))});
                 }
             }).catch(function (error) {
                 console.log(error);
-                return res.status(400).send({ datos: { Error: "hubo un problema" } });
+                return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
             });
         });
     })

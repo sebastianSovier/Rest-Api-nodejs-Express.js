@@ -22,13 +22,12 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
             console.log(resultPaises)
             return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
 
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
           });
         }
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }
@@ -49,13 +48,11 @@ router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, 
           paisesDal.ObtenerPaisesPorFechas(request.fecha_desde, request.fecha_hasta, request.usuario_id).then(function (resultPaises) {
             return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
 
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
           });
         }
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
       }).finally(function () {
       });
     }
@@ -88,6 +85,8 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
         }
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }
@@ -111,18 +110,13 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
             paisesDal.ObtenerPaises(request.usuario_id).then(function (resultPaises) {
               console.log(resultPaises)
               return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
-            }).catch(function (error) {
-              console.log(error);
-            }).finally(function () {
             });
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
           });
         }
-
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
+
       }).finally(function () {
       });
     }
@@ -142,19 +136,12 @@ router.put('/ModificarPais', helper.verifyToken, async function (req, res, next)
 
             paisesDal.ObtenerPaises(request.usuario_id).then(function (resultPaises) {
               return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
-
-
-            }).catch(function (error) {
-              console.log(error);
-            }).finally(function () {
             });
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
           });
         }
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
       }).finally(function () {
       });
     }
@@ -174,17 +161,12 @@ router.delete('/EliminarPais', helper.verifyToken, async function (req, res, nex
             paisesDal.ObtenerPaises(request.usuario_id).then(function (resultPaises) {
 
               return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
-            }).catch(function (error) {
-              console.log(error);
-            }).finally(function () {
             });
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
           });
         }
       }).catch(function (error) {
         console.log(error);
+        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
       }).finally(function () {
       });
     }
