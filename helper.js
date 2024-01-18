@@ -7,12 +7,12 @@ function getOffset(currentPage = 1, listPerPage) {
 }
 
 function encrypt(data){
-  var resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
+  const resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
   return resp;
 }
 function decrypt(data){
-  var bytes  = CryptoJS.AES.decrypt(data,config.secret);
-  var resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  const bytes  = CryptoJS.AES.decrypt(data,config.secret);
+  const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   return resp;
 
   
@@ -23,10 +23,10 @@ function decryptQuery(data){
   const r3 = new RegExp("=", 'g')
   const r4 = new RegExp("&", 'g')
   console.log("data: "+data);
-  var bytes  = CryptoJS.AES.decrypt(data.toString(), config.secret);
-  var originalText = bytes.toString(CryptoJS.enc.Utf8);
+  const bytes  = CryptoJS.AES.decrypt(data.toString(), config.secret);
+  const originalText = bytes.toString(CryptoJS.enc.Utf8);
   console.log("originalText: "+originalText);
-  var resp = originalText.replace(r3,":").replace(r4,",").trimStart('"').trimEnd('"').replace(r1,"").replace(r2,'"');
+  const resp = originalText.replace(r3,":").replace(r4,",").trimStart('"').trimEnd('"').replace(r1,"").replace(r2,'"');
   console.log(JSON.parse("{"+resp+"}"));
   return JSON.parse("{"+resp+"}");
 }

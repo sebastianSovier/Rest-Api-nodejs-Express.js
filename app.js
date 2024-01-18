@@ -1,19 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-var cors = require('cors');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8080;
 const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
 const path = require("path");
-var cors = require('cors');
-var corsOptions = {
+const corsOptions = {
   origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://localhost:4200'],
   optionsSuccessStatus: 200 || 204
 }
 app.disable('x-powered-by');
-
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, "files")));

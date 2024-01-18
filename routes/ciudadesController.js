@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const ciudadesDal = require('../services/ciudadesDal');
 const helper = require('../helper');
-var jwt = require('jsonwebtoken');
-var config = require('../config');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
 
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {

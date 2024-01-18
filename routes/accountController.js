@@ -1,16 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const usuarioDal = require('../services/usuariosDal');
-var jwt = require('jsonwebtoken');
-var config = require('../config');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 const helper = require('../helper');
-var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-router.post('/Login', urlencodedParser,async function (req, res) {
+router.post('/Login',async function (req, res) {
     err = "";
     console.log(req.body);
     const request = helper.decrypt(req.body.data);
@@ -30,7 +28,7 @@ router.post('/Login', urlencodedParser,async function (req, res) {
                 console.log(resultBcrypt)
                 if(resultBcrypt == true){
                     console.log(result.data[0].contrasena)
-                    var token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
+                    const token = jwt.sign({ id: result.data[0].usuario_id }, config.secret, {
                         expiresIn: "5m"
                     });
                     return res.status(200).send({data:helper.encrypt(JSON.stringify({ auth: true, access_Token: token }))});

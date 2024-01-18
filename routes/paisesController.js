@@ -3,8 +3,8 @@ const router = express.Router();
 const paisesDal = require('../services/paisesDal');
 const usuariosDal = require('../services/usuariosDal');
 const helper = require('../helper');
-var jwt = require('jsonwebtoken');
-var config = require('../config');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
 
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
@@ -70,11 +70,11 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
         console.log(result);
         if (result.data.length > 0) {
           paisesDal.ObtenerPaises(result.data[0].usuario_id).then(function (result) {
-            var outputData = result.data[0].map(Object.values);
+            const outputData = result.data[0].map(Object.values);
             const workbook = helper.exportXlsx(outputData);
             workbook.xlsx.writeBuffer().then(function (result) {
               console.log(result);
-              var string64 = result.toString('base64');
+              const string64 = result.toString('base64');
               return res.status(200).send({data:helper.encrypt(JSON.stringify(string64))});
               
             });
