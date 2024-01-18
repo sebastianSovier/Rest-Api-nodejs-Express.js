@@ -14,6 +14,8 @@ function decrypt(data){
   var bytes  = CryptoJS.AES.decrypt(data,config.secret);
   var resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   return resp;
+
+  
 }
 function decryptQuery(data){
   const r1 = new RegExp("/", 'g')

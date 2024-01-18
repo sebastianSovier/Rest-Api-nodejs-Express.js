@@ -10,7 +10,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-router.post('/Login', urlencodedParser, function (req, res) {
+router.post('/Login', urlencodedParser,async function (req, res) {
     err = "";
     console.log(req.body);
     const request = helper.decrypt(req.body.data);
@@ -20,7 +20,7 @@ router.post('/Login', urlencodedParser, function (req, res) {
     }
     if (err === "invalid") return res.status(500).send("There was a problem validando the user.")
     // create a token
-    usuarioDal.ObtenerUsuario(request.Username).then(function (result) {
+   await usuarioDal.ObtenerUsuario(request.Username).then(function (result) {
         console.log(result);
         console.log(result.data.length);
         if (result.data.length > 0) {
@@ -34,12 +34,14 @@ router.post('/Login', urlencodedParser, function (req, res) {
                         expiresIn: "5m"
                     });
                     return res.status(200).send({data:helper.encrypt(JSON.stringify({ auth: true, access_Token: token }))});
-                    //global.token = token;
-                    //return res.status(200).send();
                 }else{
-                    return res.status(200).send(helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "contrasena incorrecta" })));
+                    console.log("aqui1");
+                    return res.status(401).send({data:helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "contrasena incorrecta" }))});
                 }
             });
+        }else{
+            console.log("aqui2");
+            return res.status(401).send({data:helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecta"}))});
         }
     }).catch(function (error) {
         console.log(error);
