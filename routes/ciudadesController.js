@@ -9,7 +9,7 @@ const config = require('../config');
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
-      res.sendStatus(403);
+       return res.sendStatus(403);
     }
   });
   const request = helper.decryptQuery(req.query.data);
@@ -31,7 +31,7 @@ router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) 
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
-      res.sendStatus(403);
+      return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
       ciudadesDal.InsertarCiudad(request).then(function (result) {
@@ -51,7 +51,7 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
 router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
-      res.sendStatus(403);
+      return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
       console.log("request")
@@ -73,7 +73,7 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
 router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
-      res.sendStatus(403);
+      return res.sendStatus(403);
     } else {
       const request = helper.decryptQuery(req.query.data);
       ciudadesDal.EliminarCiudad(request.ciudad_id).then(function (result) {
