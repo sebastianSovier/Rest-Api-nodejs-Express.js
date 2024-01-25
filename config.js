@@ -9,7 +9,7 @@ const config = {
     database: env.DB_NAME || 'bdpaises',
   },
   listPerPage: env.LIST_PER_PAGE || 10,
-  secret:'papucho'
+  secret:'a-very-long-radonmly-generated-secret-key-that-cannot-be-guessed'
 };
 
 

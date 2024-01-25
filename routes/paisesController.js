@@ -8,8 +8,7 @@ const config = require('../config');
 
 
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
-   
+  jwt.verify(req.token, config.secret, (err, authdata) =>{
     if (err) {
       return res.sendStatus(403);
     } else {
