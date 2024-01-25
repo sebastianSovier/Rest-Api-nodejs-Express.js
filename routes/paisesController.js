@@ -5,7 +5,16 @@ const usuariosDal = require('../services/usuariosDal');
 const helper = require('../helper');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-
+const axios = require('axios').default;
+const https = require('https');
+const instance = axios.create({
+    baseURL:"https://localhost:44385",
+    httpsAgent: new https.Agent({  
+      rejectUnauthorized: false
+    }),
+    responseType:"json",
+    headers:{"Content-Type" : "application/json"}
+  });
 
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) =>{
@@ -14,21 +23,20 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
     } else {
       console.log(authdata);
       const request = helper.decryptQuery(decodeURIComponent(req.query.data));
-      usuariosDal.ObtenerUsuario(request.usuario).then(function (result) {
-        console.log(result);
-        if (result.data.length > 0) {
-          paisesDal.ObtenerPaises(result.data[0].usuario_id).then(function (resultPaises) {
-            console.log(resultPaises)
-            return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
-
-          });
-        }
-      }).catch(function (error) {
-        console.log(error);
+      instance.post('/Countries/TodosLosPaises',
+      request,{headers:{"Authorization":"Bearer "+helper.reqToken(req)}}
+    ).then(function (response) {
+      console.log(response.data);
+      if (response && response.data) {
+         return res.status(200).send({data:helper.encrypt(JSON.stringify(response.data))});
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
         return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-
-      }).finally(function () {
-      });
+    })
+    .finally(function () {
+    }); 
     }
   });
 });
@@ -38,22 +46,20 @@ router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, 
       return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
-      usuariosDal.ObtenerUsuario(request.usuario).then(function (result) {
-        if (result.data.length > 0) {
-
-          console.log(result.data[0]);
-          request.usuario_id = result.data[0].usuario_id;
-          console.log(request);
-          paisesDal.ObtenerPaisesPorFechas(request.fecha_desde, request.fecha_hasta, request.usuario_id).then(function (resultPaises) {
-            return res.status(200).send({data:helper.encrypt(JSON.stringify(resultPaises.data[0]))});
-
-          });
-        }
-      }).catch(function (error) {
-        console.log(error);
+      instance.post('/Countries/ObtenerPaisesPorFechas',
+      request,{headers:{"Authorization":"Bearer "+helper.reqToken(req)}}
+    ).then(function (response) {
+      console.log(response.data);
+      if (response && response.data) {
+         return res.status(200).send({data:helper.encrypt(JSON.stringify(response.data))});
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
         return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-      }).finally(function () {
-      });
+    })
+    .finally(function () {
+    }); 
     }
   });
 
@@ -65,23 +71,20 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
     } else {
       console.log(authdata);
       const request = helper.decryptQuery(req.query.data);
-      usuariosDal.ObtenerUsuario(request.usuario).then(function (result) {
+
+      instance.post('/Countries/GetExcelPaises',
+      request,{headers:{"Authorization":"Bearer "+helper.reqToken(req)}}
+    ).then(function (response) {
+      console.log(response.data);
+      if (response && response.data) {
+      const outputData = response.data.map(Object.values);
+      const workbook = helper.exportXlsx(outputData);
+      workbook.xlsx.writeBuffer().then(function (result) {
         console.log(result);
-        if (result.data.length > 0) {
-          paisesDal.ObtenerPaises(result.data[0].usuario_id).then(function (result) {
-            const outputData = result.data[0].map(Object.values);
-            const workbook = helper.exportXlsx(outputData);
-            workbook.xlsx.writeBuffer().then(function (result) {
-              console.log(result);
-              const string64 = result.toString('base64');
-              return res.status(200).send({data:helper.encrypt(JSON.stringify(string64))});
-              
-            });
-          }).catch(function (error) {
-            console.log(error);
-          }).finally(function () {
-          });
-        }
+        const string64 = result.toString('base64');
+        return res.status(200).send({data:helper.encrypt(JSON.stringify(string64))});
+        });
+      }
       }).catch(function (error) {
         console.log(error);
         return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});

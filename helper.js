@@ -53,6 +53,19 @@ function verifyToken(req, res, next) {
      return res.sendStatus(403);
   }
 }
+function reqToken(req){
+  const bearerHeader = req.headers['authorization'];
+  if (bearerHeader) {
+    const bearer = bearerHeader.split(' ');
+    const bearerToken = bearer[1];
+    console.log(bearerToken);
+    return bearerToken;
+  } else {
+    // Forbidden
+     return res.sendStatus(401);
+  }
+ 
+}
 
 function exportXlsx(array) {
   try {
@@ -91,5 +104,6 @@ module.exports = {
   exportXlsx,
   encrypt,
   decrypt,
-  decryptQuery
+  decryptQuery,
+  reqToken
 }

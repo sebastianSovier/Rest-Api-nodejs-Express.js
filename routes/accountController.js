@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const usuarioDal = require('../services/usuariosDal');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
 const helper = require('../helper');
-const axios = require('axios').default;
+
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const axios = require('axios').default;
 const https = require('https');
 const instance = axios.create({
     baseURL:"https://localhost:44385",
