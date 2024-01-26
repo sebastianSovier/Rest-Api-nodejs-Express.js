@@ -1,32 +1,41 @@
 const express = require('express');
 const router = express.Router();
-const ciudadesDal = require('../services/ciudadesDal');
 const helper = require('../helper');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-
+const axios = require('axios').default;
+const https = require('https');
+const instance = axios.create({
+  baseURL: "https://localhost:44385",
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false
+  }),
+  responseType: "json",
+  headers: { "Content-Type": "application/json" }
+});
 
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
        return res.sendStatus(403);
+    }else{
+      const request = helper.decryptQuery(req.query.data);
+      instance.post('/Ciudades/CiudadesPais',
+        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+        })
+        .finally(function () {
+        });
     }
   });
-  const request = helper.decryptQuery(req.query.data);
-  console.log(request);
-  ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
-    console.log("resultCiudades")
-    console.log(resultCiudades)
-
-      return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
-    
-  }).catch(function (error) {
-    console.log(error);
-    return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-
-  }).finally(function () {
-  });
-
 });
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
@@ -34,17 +43,20 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
       return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
-      ciudadesDal.InsertarCiudad(request).then(function (result) {
-        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
-          console.log(resultCiudades)
-          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});    
+      instance.post('/Ciudades/IngresarCiudad',
+        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
-      }).catch(function (error) {
-        console.log(error);
-        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-
-      }).finally(function () {
-      });
+        .finally(function () {
+        });
     }
   });
 });
@@ -54,18 +66,19 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
       return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
-      console.log("request")
-      console.log(request)
-      ciudadesDal.ModificarCiudad(request).then(function (result) {
-        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
-          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
-
-        });
-      }).catch(function (error) {
+      instance.post('/Ciudades/ModificarCiudad',
+      request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+    ).then(function (response) {
+      console.log(response.data);
+      if (response && response.data) {
+        return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+      }
+    })
+      .catch(function (error) {
         console.log(error);
-        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-
-      }).finally(function () {
+        return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+      })
+      .finally(function () {
       });
     }
   });
@@ -76,18 +89,20 @@ router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, n
       return res.sendStatus(403);
     } else {
       const request = helper.decryptQuery(req.query.data);
-      ciudadesDal.EliminarCiudad(request.ciudad_id).then(function (result) {
-        ciudadesDal.ObtenerCiudades(request.pais_id).then(function (resultCiudades) {
-          return res.status(200).send({data:helper.encrypt(JSON.stringify(resultCiudades.data))});
-          
-
+      instance.post('/Ciudades/EliminarCiudad',
+        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
-      }).catch(function (error) {
-        console.log(error);
-        return res.status(200).send({data:helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } }))});
-
-      }).finally(function () {
-      });
+        .finally(function () {
+        });
     }
   });
 });
