@@ -2,6 +2,7 @@
 const ExcelJS = require('exceljs');
 const CryptoJS = require("crypto-js");
 const config = require("./config");
+const fs = require('fs');
 function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage];
 }
@@ -97,6 +98,17 @@ function exportXlsx(array) {
 
 }
 
+function logToFile(message) {
+  const logStream = fs.createWriteStream('logs.txt', { flags: 'a' });
+  logStream.write(`${message}\n`);
+  logStream.end();
+}
+const logger = {
+  info: (message) => logToFile(`[INFO] ${message}`),
+  warn: (message) => logToFile(`[WARN] ${message}`),
+  error: (message) => logToFile(`[ERROR] ${message}`),
+};
+
 module.exports = {
   getOffset,
   emptyOrRows,
@@ -105,5 +117,6 @@ module.exports = {
   encrypt,
   decrypt,
   decryptQuery,
-  reqToken
+  reqToken,
+  logger
 }
