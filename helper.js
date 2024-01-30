@@ -107,7 +107,7 @@ let dd = today.getDate();
 if (dd < 10) dd = '0' + dd;
 if (mm < 10) mm = '0' + mm;
 
-const formattedToday = dd + '/' + mm + '/' + yyyy;
+const formattedToday = dd + '_' + mm + '_' + yyyy;
 
   const logStream = fs.createWriteStream('Logs'+formattedToday+'.txt', { flags: 'a' });
   logStream.write(`${message}\n`);
