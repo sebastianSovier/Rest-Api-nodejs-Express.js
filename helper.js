@@ -99,7 +99,17 @@ function exportXlsx(array) {
 }
 
 function logToFile(message) {
-  const logStream = fs.createWriteStream('logs.txt', { flags: 'a' });
+  const today = new Date();
+const yyyy = today.getFullYear();
+let mm = today.getMonth() + 1; // Months start at 0!
+let dd = today.getDate();
+
+if (dd < 10) dd = '0' + dd;
+if (mm < 10) mm = '0' + mm;
+
+const formattedToday = dd + '/' + mm + '/' + yyyy;
+
+  const logStream = fs.createWriteStream('Logs'+formattedToday+'.txt', { flags: 'a' });
   logStream.write(`${message}\n`);
   logStream.end();
 }
