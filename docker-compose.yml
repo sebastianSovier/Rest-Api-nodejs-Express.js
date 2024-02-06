@@ -9,7 +9,8 @@ services:
      ports:
         - "3000:3000"
      networks:
-      - netcoreconcepts_mi_red
+       netcoreconcepts_mi_red:
+         ipv4_address: 172.18.0.4
      environment:
       - SERVICIO2_URL=https://172.18.0.2:443
    web:
@@ -17,7 +18,8 @@ services:
      ports:
        - "4200:4200"
      networks:
-       - netcoreconcepts_mi_red
+        netcoreconcepts_mi_red:
+          ipv4_address: 172.18.0.5
 networks:
   netcoreconcepts_mi_red:
     external: true
