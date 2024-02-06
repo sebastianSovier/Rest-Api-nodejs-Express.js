@@ -1,33 +1,25 @@
-version: '3'
-
+version: '2'
 services:
-    api:
-        container_name: node-mysqlapi
-        restart: always
-        ports:
-            - "8080:8080"
-        links:
-            - "mysql"
-        image: secros18/node-restapi
-        
-    web:
-        container_name: angular-nodeapp
-        ports:
-            - "80:80"
-        image: secros18/angular-app
-    mysql:
-        container_name: mysql
-        environment:
-          MYSQL_DATABASE: 'bdpaises'
-          MYSQL_USER: 'secros'
-          MYSQL_PASSWORD: 'sovier'
-          MYSQL_ROOT_PASSWORD: 'sovier'
+   api:
+     image: secros18/node-restapi:latest
+     build:
+       context: .
+       dockerfile: Dockerfile
+     restart: always
+     ports:
+        - "3000:3000"
+     networks:
+      - netcoreconcepts_mi_red
+     environment:
+      - SERVICIO2_URL=https://172.18.0.2:443
+   web:
+     image: secros18/angular-app:latest
+     ports:
+       - "4200:4200"
+     networks:
+       - netcoreconcepts_mi_red
+networks:
+  netcoreconcepts_mi_red:
+    external: true
 
-        image: mysql
-        ports:
-          - "3306:3306"
-        volumes:
-          - mysql:/var/lib/mysql
-volumes:
-  mysql:
 
