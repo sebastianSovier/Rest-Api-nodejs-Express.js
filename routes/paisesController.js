@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const config = require('../config');
 const axios = require('axios').default;
 const https = require('https');
+require('dotenv').config();
 const instance = axios.create({
-  baseURL: "https://172.18.0.2:443",
+  baseURL: process.env.URLCORELOCAL,
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
   }),
@@ -79,11 +80,11 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
         if (response && response.data) {
           const outputData = response.data.map(Object.values);
           const workbook = helper.exportXlsx(outputData);
-          workbook.xlsx.writeBuffer().then(function (result) {
+          workbook?.xlsx.writeBuffer().then(function (result) {
             console.log(result);
             const string64 = result.toString('base64');
             return res.status(200).send({ data: helper.encrypt(JSON.stringify(string64)) });
-          });
+          }, error => { console.log("workbook?.xlsx"); console.log(error) });
         }
       }).catch(function (error) {
         console.log(error);
@@ -117,6 +118,30 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
         })
         .finally(function () {
         });
+    }
+  });
+});
+router.post('/ImportarPaisCiudades', helper.verifyToken, async function (req, res, next) {
+  jwt.verify(req.token, config.secret, (err, authdata) => {
+    if (err) {
+      return res.sendStatus(403);
+    } else {
+      const request = helper.decrypt(req.body.data);
+       instance.post('/Countries/GetDataFromExcel',
+         request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+       ).then(function (response) {
+         console.log(response.data);
+         if (response && response.data) {
+           return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+         }
+       })
+         .catch(function (error) {
+           console.log(error);
+           helper.logger.error(error);
+           return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+         })
+         .finally(function () {
+         });
     }
   });
 });

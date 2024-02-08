@@ -5,8 +5,9 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const axios = require('axios').default;
 const https = require('https');
+require('dotenv').config();
 const instance = axios.create({
-  baseURL: "https://172.18.0.2:443",
+  baseURL: process.env.URLCORELOCAL,
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
   }),
