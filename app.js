@@ -21,10 +21,8 @@ app.use('/Account', AccountRoutes);
 app.use('/Countries', PaisesRoutes);
 app.use('/Ciudades', CiudadesRoutes);
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  console.error(err.message, err.stack);
-  res.status(statusCode).json({'message': err.message});
-  return;
+  console.error(err.stack);
+  res.status(500).send('Error interno del servidor');
 });
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

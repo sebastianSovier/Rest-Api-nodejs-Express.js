@@ -3,20 +3,28 @@ const ExcelJS = require('exceljs');
 const CryptoJS = require("crypto-js");
 const config = require("./config");
 const fs = require('fs');
-
+require('dotenv').config();
 function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage];
 }
 
 function encrypt(data) {
-  const resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
-  return resp;
+  if (process.env.encrypt == true) {
+    const resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
+    return resp;
+  } else {
+    return data;
+  }
 }
 function decrypt(data) {
-  const bytes = CryptoJS.AES.decrypt(data, config.secret);
-  const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  return resp;
-
+  console.log(process.env.encrypt)
+  if (process.env.encrypt == true) {
+    const bytes = CryptoJS.AES.decrypt(data, config.secret);
+    const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return resp;
+  } else {
+    return data;
+  }
 
 }
 function decryptQuery(data) {
@@ -25,11 +33,16 @@ function decryptQuery(data) {
   const r3 = new RegExp("=", 'g')
   const r4 = new RegExp("&", 'g')
   console.log("data: " + data);
-  const bytes = CryptoJS.AES.decrypt(data.toString(), config.secret);
-  const originalText = bytes.toString(CryptoJS.enc.Utf8);
-  console.log("originalText: " + originalText);
-  const resp = originalText.replace(r3, ":").replace(r4, ",").trimStart('"').trimEnd('"').replace(r1, "").replace(r2, '"');
-  console.log(JSON.parse("{" + resp + "}"));
+  let resp;
+  if (process.env.encrypt == true) {
+    const bytes = CryptoJS.AES.decrypt(data.toString(), config.secret);
+    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+    console.log("originalText: " + originalText);
+    resp = originalText.replace(r3, ":").replace(r4, ",").trimStart('"').trimEnd('"').replace(r1, "").replace(r2, '"');
+    console.log(JSON.parse("{" + resp + "}"));
+  } else {
+    resp = data.replace(r3, ":").replace(r4, ",").trimStart('"').trimEnd('"').replace(r1, "").replace(r2, '"');
+  }
   return JSON.parse("{" + resp + "}");
 }
 
@@ -47,7 +60,7 @@ function verifyToken(req, res, next) {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
     req.token = bearerToken;
-   // console.log(req.token);
+    // console.log(req.token);
     next();
 
   } else {
@@ -60,7 +73,7 @@ function reqToken(req) {
   if (bearerHeader) {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
-  //  console.log(bearerToken);
+    //  console.log(bearerToken);
     return bearerToken;
   } else {
     // Forbidden
