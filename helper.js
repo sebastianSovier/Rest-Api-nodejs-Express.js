@@ -47,7 +47,7 @@ function verifyToken(req, res, next) {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
     req.token = bearerToken;
-    console.log(req.token);
+   // console.log(req.token);
     next();
 
   } else {
@@ -60,7 +60,7 @@ function reqToken(req) {
   if (bearerHeader) {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
-    console.log(bearerToken);
+  //  console.log(bearerToken);
     return bearerToken;
   } else {
     // Forbidden

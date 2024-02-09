@@ -12,9 +12,10 @@ const instance = axios.create({
     rejectUnauthorized: false
   }),
   responseType: "json",
+  maxContentLength: Infinity,
+  maxBodyLength: Infinity,
   headers: { "Content-Type": "application/json" }
 });
-
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
@@ -121,30 +122,32 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
     }
   });
 });
-router.post('/ImportarPaisCiudades', helper.verifyToken, async function (req, res, next) {
+router.post('/ImportarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
       const request = helper.decrypt(req.body.data);
-       instance.post('/Countries/GetDataFromExcel',
-         request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-       ).then(function (response) {
-         console.log(response.data);
-         if (response && response.data) {
-           return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-         }
-       })
-         .catch(function (error) {
-           console.log(error);
-           helper.logger.error(error);
-           return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-         })
-         .finally(function () {
-         });
+      instance.post('/Countries/GetDataFromExcel',
+        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          helper.logger.error(error);
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+        })
+        .finally(function () {
+        });
     }
   });
 });
+
+
 router.put('/ModificarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, config.secret, (err, authdata) => {
     if (err) {
