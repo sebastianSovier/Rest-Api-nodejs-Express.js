@@ -1,0 +1,8 @@
+[ERROR] Error: `identifiers` parameter must be an array
+[ERROR] Error: Unrecognized identifier: trafalgar34
+[ERROR] Error: connect ECONNREFUSED ::1:44385
+[ERROR] AxiosError: Request failed with status code 403
+[ERROR] AxiosError: Request failed with status code 403
+[ERROR] AxiosError: Request failed with status code 403
+[ERROR] AxiosError: Request failed with status code 403
+[ERROR] AxiosError: Request failed with status code 403
