@@ -6,6 +6,7 @@ const saltRounds = 10;
 const axios = require('axios').default;
 const https = require('https');
 const admin = require("firebase-admin");
+
 const serviceAccount = require("../path/proyecto-angular-12-firebase-adminsdk-3b0cj-ba2223cc30.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -35,10 +36,14 @@ router.post('/Login', async function (req, res) {
     err = "invalid";
   }
   if (err === "invalid") return res.status(500).send("There was a problem validating the user.")
+  const validToken = await helper.createAssessment(request.token);
+  console.log("validToken");
+  console.log(validToken);
   instance.post('/Account/Login',
     request
   ).then(function (response) {
-    console.log(response.data.data);
+
+    console.log(response.data);
     if (response && response.data) {
       if (response.data.auth == true) {
         admin.auth().getUserByEmail(response.data.correo)
