@@ -16,7 +16,7 @@ const instance = axios.create({
 });
 
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
        return res.sendStatus(403);
     }else{
@@ -40,7 +40,7 @@ router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) 
   });
 });
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -64,7 +64,7 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
   });
 });
 router.post('/ImportarCiudad', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -89,7 +89,7 @@ router.post('/ImportarCiudad', helper.verifyToken, async function (req, res, nex
 });
 
 router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -113,7 +113,7 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
   });
 });
 router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {

@@ -17,7 +17,7 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" }
 });
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -42,7 +42,7 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
   });
 });
 router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -67,7 +67,7 @@ router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, 
 
 });
 router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -99,7 +99,7 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
 
 });
 router.post('/IngresarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -123,7 +123,7 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
   });
 });
 router.post('/ImportarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -149,7 +149,7 @@ router.post('/ImportarPais', helper.verifyToken, async function (req, res, next)
 
 
 router.put('/ModificarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {
@@ -175,7 +175,7 @@ router.put('/ModificarPais', helper.verifyToken, async function (req, res, next)
 });
 
 router.delete('/EliminarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, config.secret, (err, authdata) => {
+  jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       return res.sendStatus(403);
     } else {

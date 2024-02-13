@@ -13,7 +13,7 @@ function getOffset(currentPage = 1, listPerPage) {
 
 function encrypt(data) {
   if (process.env.encrypt == true) {
-    const resp = CryptoJS.AES.encrypt(JSON.stringify(data), config.secret).toString();
+    const resp = CryptoJS.AES.encrypt(JSON.stringify(data), process.env.secret).toString();
     return resp;
   } else {
     return data;
@@ -22,7 +22,7 @@ function encrypt(data) {
 function decrypt(data) {
   console.log(process.env.encrypt)
   if (process.env.encrypt == true) {
-    const bytes = CryptoJS.AES.decrypt(data, config.secret);
+    const bytes = CryptoJS.AES.decrypt(data, process.env.secret);
     const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     return resp;
   } else {
@@ -38,7 +38,7 @@ function decryptQuery(data) {
   console.log("data: " + data);
   let resp;
   if (process.env.encrypt == true) {
-    const bytes = CryptoJS.AES.decrypt(data.toString(), config.secret);
+    const bytes = CryptoJS.AES.decrypt(data.toString(), process.env.secret);
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
     console.log("originalText: " + originalText);
     resp = originalText.replace(r3, ":").replace(r4, ",").trimStart('"').trimEnd('"').replace(r1, "").replace(r2, '"');
