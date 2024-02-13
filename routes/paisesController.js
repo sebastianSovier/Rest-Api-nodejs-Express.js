@@ -19,6 +19,7 @@ const instance = axios.create({
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
+      console.log(err)
       return res.sendStatus(403);
     } else {
       console.log(authdata);
