@@ -5,6 +5,14 @@ const config = require("./config");
 const fs = require('fs');
 require('dotenv').config();
 const { RecaptchaEnterpriseServiceClient } = require('@google-cloud/recaptcha-enterprise');
+const admin = require("firebase-admin");
+
+const serviceAccount = require("./path/proyecto-angular-12-firebase-adminsdk-3b0cj-ba2223cc30.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://proyecto-angular-12-default-rtdb.firebaseio.com"
+});
+const auth = admin.auth();
 
 
 function getOffset(currentPage = 1, listPerPage) {
@@ -145,12 +153,9 @@ async function createAssessment(token) {
   projectID = process.env.projectID;
   recaptchaAction = process.env.recaptchaAction
   recaptchaKey = process.env.recaptchaKey;
-  // Crea el cliente de reCAPTCHA.
-  // TODO: almacena en caché el código de generación de clientes (recomendado) o llama a client.close() antes de salir del método.
+
   const client = new RecaptchaEnterpriseServiceClient();
   const projectPath = client.projectPath(projectID);
-
-  // Crea la solicitud de evaluación.
   const request = ({
     assessment: {
       event: {
@@ -163,18 +168,11 @@ async function createAssessment(token) {
 
   const [response] = await client.createAssessment(request);
 
-  // Verifica si el token es válido.
   if (!response.tokenProperties.valid) {
     console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
     return null;
   }
-
-  // Verifica si se ejecutó la acción esperada.
-  // The `action` property is set by user client in the grecaptcha.enterprise.execute() method.
   if (response.tokenProperties.action === recaptchaAction) {
-    // Obtén la puntuación de riesgo y los motivos.
-    // Para obtener más información sobre cómo interpretar la evaluación, consulta:
-    // https://cloud.google.com/recaptcha-enterprise/docs/interpret-assessment
     console.log(`The reCAPTCHA score is: ${response.riskAnalysis.score}`);
     response.riskAnalysis.reasons.forEach((reason) => {
       console.log(reason);
@@ -185,6 +183,37 @@ async function createAssessment(token) {
     console.log("The action attribute in your reCAPTCHA tag does not match the action you are expecting to score");
     return null;
   }
+}
+async function validateUser(correo, password) {
+  let token = "";
+  const searchUser = await admin.auth().getUserByEmail(correo);
+  if (searchUser && searchUser.uid) {
+    const createToken = await auth.createCustomToken(searchUser.uid)
+    if (createToken) {
+      token = createToken;
+    } else {
+      console.error('Error al crear el token personalizado:', error);
+    }
+  } else {
+    const createUser = await admin.auth().createUser({
+      email: correo,
+      password: password,
+    });
+    if (createUser && createUser.uid) {
+      const createToken = await auth.createCustomToken(userRecord.uid)
+      if (createToken) {
+        token = createToken;
+      } else {
+        console.error('Error al crear el token personalizado:', error);
+      }
+
+    } else {
+      console.error('Error al crear el token personalizado:', error);
+    }
+  }
+  console.log("token")
+  console.log(token)
+  return token;
 }
 
 module.exports = {
@@ -197,5 +226,6 @@ module.exports = {
   decryptQuery,
   reqToken,
   logger,
-  createAssessment
+  createAssessment,
+  validateUser
 }

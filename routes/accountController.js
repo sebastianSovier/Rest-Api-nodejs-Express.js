@@ -5,15 +5,6 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const axios = require('axios').default;
 const https = require('https');
-const admin = require("firebase-admin");
-
-const serviceAccount = require("../path/proyecto-angular-12-firebase-adminsdk-3b0cj-ba2223cc30.json");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://proyecto-angular-12-default-rtdb.firebaseio.com"
-});
-const auth = admin.auth();
-
 require('dotenv').config();
 const instance = axios.create({
   baseURL: process.env.URLCORELOCAL,
@@ -41,47 +32,21 @@ router.post('/Login', async function (req, res) {
   console.log(validToken);
   instance.post('/Account/Login',
     request
-  ).then(function (response) {
+  ).then(async function (response) {
 
     console.log(response.data);
     if (response && response.data) {
       if (response.data.auth == true) {
-        admin.auth().getUserByEmail(response.data.correo)
-          .then((userRecord) => {
-            auth.createCustomToken(userRecord.uid)
-              .then((customToken) => {
-                return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: customToken })) });
-              })
-              .catch((error) => {
-                console.error('Error al crear el token personalizado:', error);
-              });
-          })
-          .catch((error) => {
-            admin.auth().createUser({
-              email: response.data.correo,
-              password: request.Password,
-            })
-              .then((userRecord) => {
-                console.log('Successfully created new user:', userRecord.uid);
-                auth.createCustomToken(userRecord.uid)
-                  .then((customToken) => {
-                    console.log('Token personalizado:', customToken);
-                    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: customToken })) });
-                  })
-                  .catch((error) => {
-                    console.error('Error al crear el token personalizado:', error);
-                  });
-              })
-              .catch((error) => {
-                console.error('Error creating user:', error);
-              });
-          });
+        const tokenFirebase = await helper.validateUser(response.data.correo, request.Password);
+        if (tokenFirebase) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: tokenFirebase })) });
+        } else {
+          return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+        }
       } else {
-        console.log("aqui1");
         return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
       }
     } else {
-      console.log("aqui2");
       return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
     }
   })
