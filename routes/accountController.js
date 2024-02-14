@@ -27,7 +27,13 @@ router.post('/Login', async function (req, res) {
     err = "invalid";
   }
   if (err === "invalid") return res.status(500).send("There was a problem validating the user.")
-  const validToken = await helper.createAssessment(request.token);
+  const validToken = await helper.createAssessment(request.token, request.tokenv2);
+  if (!validToken) {
+    return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: 'Internal server error', tokenRecaptcha: request.token })) });
+  }
+  if ((validToken && validToken.score < 0.5 && validToken.success === false) || (validToken && validToken.success === false)) {
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "3", auth: false, mensaje: "recaptcha verification failed", score: validToken.score })) })
+  }
   console.log("validToken");
   console.log(validToken);
   instance.post('/Account/Login',

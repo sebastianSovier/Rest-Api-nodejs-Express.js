@@ -3,6 +3,7 @@ const ExcelJS = require('exceljs');
 const CryptoJS = require("crypto-js");
 const config = require("./config");
 const fs = require('fs');
+const axios = require('axios').default;
 require('dotenv').config();
 const { RecaptchaEnterpriseServiceClient } = require('@google-cloud/recaptcha-enterprise');
 const admin = require("firebase-admin");
@@ -149,39 +150,57 @@ const logger = {
   error: (message) => logToFile(`[ERROR] ${message}`),
 };
 
-async function createAssessment(token) {
-  projectID = process.env.projectID;
-  recaptchaAction = process.env.recaptchaAction
-  recaptchaKey = process.env.recaptchaKey;
-
-  const client = new RecaptchaEnterpriseServiceClient();
-  const projectPath = client.projectPath(projectID);
-  const request = ({
-    assessment: {
-      event: {
-        token: token,
-        siteKey: recaptchaKey,
+async function createAssessment(token, tokenv2) {
+  if (tokenv2) {
+    token = tokenv2;
+    secretkey = process.env.secretrecaptchav2;
+    const result = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretkey}&response=${token}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+        },
       },
-    },
-    parent: projectPath,
-  });
+    );
+    result.data.score = 1;
+    return result.data;
+  } else {
+    projectID = process.env.projectID;
+    recaptchaAction = process.env.recaptchaAction
+    recaptchaKey = process.env.recaptchaKey;
 
-  const [response] = await client.createAssessment(request);
 
-  if (!response.tokenProperties.valid) {
-    console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
-    return null;
-  }
-  if (response.tokenProperties.action === recaptchaAction) {
-    console.log(`The reCAPTCHA score is: ${response.riskAnalysis.score}`);
-    response.riskAnalysis.reasons.forEach((reason) => {
-      console.log(reason);
+
+    const client = new RecaptchaEnterpriseServiceClient();
+    const projectPath = client.projectPath(projectID);
+    const request = ({
+      assessment: {
+        event: {
+          token: token,
+          siteKey: recaptchaKey,
+        },
+      },
+      parent: projectPath,
     });
 
-    return response.riskAnalysis.score;
-  } else {
-    console.log("The action attribute in your reCAPTCHA tag does not match the action you are expecting to score");
-    return null;
+    const [response] = await client.createAssessment(request);
+
+    if (!response.tokenProperties.valid) {
+      console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
+      return { success: false, score: null };
+    }
+    if (response.tokenProperties.action === recaptchaAction) {
+      console.log(`The reCAPTCHA score is: ${response.riskAnalysis.score}`);
+      response.riskAnalysis.reasons.forEach((reason) => {
+        console.log(reason);
+      });
+
+      return { success: true, score: response.riskAnalysis.score };
+    } else {
+      console.log("The action attribute in your reCAPTCHA tag does not match the action you are expecting to score");
+      return { success: false, score: null };
+    }
   }
 }
 async function validateUser(correo, password) {
