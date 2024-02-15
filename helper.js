@@ -7,7 +7,7 @@ const axios = require('axios').default;
 require('dotenv').config();
 const { RecaptchaEnterpriseServiceClient } = require('@google-cloud/recaptcha-enterprise');
 const admin = require("firebase-admin");
-
+const path = require('path');
 const serviceAccount = require("./path/proyecto-angular-12-firebase-adminsdk-3b0cj-ba2223cc30.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -235,6 +235,87 @@ async function validateUser(correo, password) {
   return token;
 }
 
+async function createPdf() {
+  const PDFDocument = require('pdfkit');
+  const fs = require('fs');
+  const doc = new PDFDocument;
+  const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.';
+
+  doc.fontSize(8);
+  doc.text(`This text is left aligned. ${lorem}`, {
+    width: 410,
+    align: 'left'
+  }
+  );
+  //doc.pipe(res);                                       // HTTP response
+  doc.image('./images/world.jpg', 0, 15, { width: 300 })
+    .text('Proportional to width', 0, 0);
+
+  // add stuff to PDF here using methods described below...
+
+  // finalize the PDF and end the stream
+  doc.pipe(fs.createWriteStream(path.join(__dirname, "./path/file.pdf"))); // write to PDF
+
+  doc.end();
+  return "";
+}
+function todayDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  let mm = today.getMonth() + 1;
+  let dd = today.getDate();
+
+  if (dd < 10) dd = '0' + dd;
+  if (mm < 10) mm = '0' + mm;
+
+  const formattedToday = dd + '/' + mm + '/' + yyyy;
+  return formattedToday;
+}
+
+async function sendEmail(object) {
+  await createPdf();
+
+
+  const nodemailer = require('nodemailer');
+
+  let textoDeCorreo = "Estimad@ " + object.nombre + "<br> Con fecha " + todayDate() + " se adjunta pdf con sus registros: <br><br>";
+
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'secros18@gmail.com',
+      pass: 'khbw uozi shmo tfly'
+    }
+  });
+
+  const mailOptions = {
+    from: "paises@paisesmundo.cl",
+    to: object.correo,
+    subject: 'Pdf Paises y Ciudades',
+    text: '',
+    html: textoDeCorreo,
+    attachments: { filename: "file.pdf", path: path.join(__dirname, "./path/file.pdf"), contentType: 'application/pdf' }
+
+  };
+
+  transporter.sendMail(mailOptions, function (error, cb) {
+    console.log(error);
+    try {
+      fs.unlinkSync(path.join(__dirname, "./path/file.pdf"))
+    } catch (err) {
+      console.error(err)
+    }
+
+  });
+}
+const cron = require('node-cron');
+//min hr day mon year
+cron.schedule('10 10 * * *', async function (now) {
+  await sendEmail();
+
+});
+
+
 module.exports = {
   getOffset,
   emptyOrRows,
@@ -246,5 +327,6 @@ module.exports = {
   reqToken,
   logger,
   createAssessment,
-  validateUser
+  validateUser,
+  sendEmail
 }
