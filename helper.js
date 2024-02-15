@@ -283,8 +283,8 @@ async function sendEmail(object) {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'secros18@gmail.com',
-      pass: 'khbw uozi shmo tfly'
+      user: process.env.user,
+      pass: process.env.pass
     }
   });
 
