@@ -28,5 +28,5 @@ app.use((err, req, res, next) => {
 });
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
-  helper.sendEmail({nombre:"sebastian sovier",correo:"sebastian.sovier@hotmail.com"});
+  //helper.sendEmail({nombre:"sebastian sovier",correo:"sebastian.sovier@hotmail.com"});
 });

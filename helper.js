@@ -14,7 +14,8 @@ admin.initializeApp({
   databaseURL: "https://proyecto-angular-12-default-rtdb.firebaseio.com"
 });
 const auth = admin.auth();
-
+const nodemailer = require('nodemailer');
+const PDFDocument = require('pdfkit');
 
 function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage];
@@ -234,30 +235,50 @@ async function validateUser(correo, password) {
   console.log(token)
   return token;
 }
+const parseMiles = (number) => {
+  try {
+    return new Intl.NumberFormat("es-CL").format(number);
+  } catch (error) {
+    return 0;
+  }
+}
+async function createPdf(usuarioPaisesCiudades) {
 
-async function createPdf() {
-  const PDFDocument = require('pdfkit');
-  const fs = require('fs');
+  const saltoLinea = "\n \n";
+  let textoPdf = "";
+  const paisesCiudades = JSON.parse(usuarioPaisesCiudades.listPaisesSerialize);
+  console.log("paisesCiudades")
+  console.log(paisesCiudades)
+  paisesCiudades.forEach(paisCiudades => {
+    let textPais = "";
+    let textCiudades = "";
+    if (paisCiudades) {
+      textPais = `El Pais  ${paisCiudades.nombre_pais} Tiene una cantidad de habitantes N° ${parseMiles(paisCiudades.poblacion)} Su Capital es ${paisCiudades.capital}.`;
+      if (paisCiudades.listCiudadesSerialize != null) {
+        textPais += "\n Sus ciudades son: ";
+        textPais += "\n";
+        const ciudadesPais = JSON.parse(paisCiudades.listCiudadesSerialize);
+        ciudadesPais.forEach(ciudades => {
+          textCiudades += `- La Ciudad ${ciudades.nombre_ciudad} Correspondiente a la región ${ciudades.region} Con una poblacion de ${parseMiles(ciudades.poblacion)} \n`;
+        });
+      }
+    }
+    textoPdf += textPais + textCiudades + saltoLinea;
+  });
+
   const doc = new PDFDocument;
-  const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.';
-
   doc.fontSize(8);
-  doc.text(`This text is left aligned. ${lorem}`, {
-    width: 410,
-    align: 'left'
+  doc.text(textoPdf, {
+    align: 'right'
   }
   );
-  //doc.pipe(res);                                       // HTTP response
-  doc.image('./images/world.jpg', 0, 15, { width: 300 })
-    .text('Proportional to width', 0, 0);
+  doc.image('./images/world.jpg', 0, 15, { width: 50, height: 50 });
 
-  // add stuff to PDF here using methods described below...
-
-  // finalize the PDF and end the stream
-  doc.pipe(fs.createWriteStream(path.join(__dirname, "./path/file.pdf"))); // write to PDF
+  const namePdf = "file" + new Date().getMilliseconds() + ".pdf"
+  doc.pipe(fs.createWriteStream(path.join(__dirname, "./path/" + namePdf)));
 
   doc.end();
-  return "";
+  return namePdf;
 }
 function todayDate() {
   const today = new Date();
@@ -272,48 +293,51 @@ function todayDate() {
   return formattedToday;
 }
 
-async function sendEmail(object) {
-  await createPdf();
+function sendEmail(data) {
 
-
-  const nodemailer = require('nodemailer');
-
-  let textoDeCorreo = "Estimad@ " + object.nombre + "<br> Con fecha " + todayDate() + " se adjunta pdf con sus registros: <br><br>";
-
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.user,
-      pass: process.env.pass
+  data.forEach(async usuarioPaisesCiudades => {
+    if (usuarioPaisesCiudades.listPaisesSerialize != null) {
+      const createPdfName = await createPdf(usuarioPaisesCiudades);
+      let textoDeCorreo = "Estimad@ " + usuarioPaisesCiudades.nombre + "<br> Con fecha " + todayDate() + " se adjunta pdf con sus registros: <br><br>";
+      await sendmail(textoDeCorreo, usuarioPaisesCiudades, createPdfName);
     }
-  });
-
-  const mailOptions = {
-    from: "paises@paisesmundo.cl",
-    to: object.correo,
-    subject: 'Pdf Paises y Ciudades',
-    text: '',
-    html: textoDeCorreo,
-    attachments: { filename: "file.pdf", path: path.join(__dirname, "./path/file.pdf"), contentType: 'application/pdf' }
-
-  };
-
-  transporter.sendMail(mailOptions, function (error, cb) {
-    console.log(error);
-    try {
-      fs.unlinkSync(path.join(__dirname, "./path/file.pdf"))
-    } catch (err) {
-      console.error(err)
-    }
-
   });
 }
-const cron = require('node-cron');
-//min hr day mon year
-cron.schedule('10 10 * * *', async function (now) {
-  await sendEmail();
+const sendmail = async (textoDeCorreo, usuarioPaisesCiudades, createPdfName) => {
+  await wrapedSendMail(textoDeCorreo, usuarioPaisesCiudades, createPdfName);
+}
 
-});
+async function wrapedSendMail(textoDeCorreo, usuarioPaisesCiudades, createPdfName) {
+  return new Promise((resolve, reject) => {
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.user,
+        pass: process.env.pass
+      }
+    });
+    const mailOptions = {
+      from: "paises@paisesmundo.cl",
+      to: usuarioPaisesCiudades.correo,
+      subject: 'Pdf Paises y Ciudades',
+      text: '',
+      html: textoDeCorreo,
+      attachments: { filename: "file.pdf", path: path.join(__dirname, "./path/" + createPdfName), contentType: 'application/pdf' }
+
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        resolve(false);
+      }
+      else {
+        fs.unlinkSync(path.join(__dirname, "./path/" + createPdfName))
+
+        resolve(true);
+      }
+    });
+  });
+}
+
 
 
 module.exports = {

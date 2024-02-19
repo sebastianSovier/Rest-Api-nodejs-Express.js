@@ -16,6 +16,28 @@ const instance = axios.create({
   maxBodyLength: Infinity,
   headers: { "Content-Type": "application/json" }
 });
+
+
+
+const cron = require('node-cron');
+//min hr day mon year
+cron.schedule('* 10 * * *', function (now) {
+  instance.post('/Countries/TodosLosPaisesByUsuarios'
+  ).then(function (response) {
+    //console.log(response.data);
+    if (response && response.data) {
+      helper.sendEmail(response.data);
+    }
+  })
+    .catch(function (error) {
+      console.log(error);
+      helper.logger.error(error);
+    })
+    .finally(function () {
+    });
+
+});
+
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
