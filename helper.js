@@ -251,13 +251,14 @@ async function createPdf(usuarioPaisesCiudades) {
   console.log(paisesCiudades)
   paisesCiudades.forEach(paisCiudades => {
     let textPais = "";
-    let textCiudades = "";
+    let textCiudades = "\n";
     if (paisCiudades) {
       textPais = `El Pais  ${paisCiudades.nombre_pais} Tiene una cantidad de habitantes N° ${parseMiles(paisCiudades.poblacion)} Su Capital es ${paisCiudades.capital}.`;
       if (paisCiudades.listCiudadesSerialize != null) {
         textPais += "\n Sus ciudades son: ";
-        textPais += "\n";
+        
         const ciudadesPais = JSON.parse(paisCiudades.listCiudadesSerialize);
+        
         ciudadesPais.forEach(ciudades => {
           textCiudades += `- La Ciudad ${ciudades.nombre_ciudad} Correspondiente a la región ${ciudades.region} Con una poblacion de ${parseMiles(ciudades.poblacion)} \n`;
         });
