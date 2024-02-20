@@ -7,7 +7,6 @@ const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
 const path = require("path");
-const helper = require('./helper');
 
 const corsOptions = {
   origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://localhost:4200'],
@@ -28,5 +27,4 @@ app.use((err, req, res, next) => {
 });
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
-  //helper.sendEmail({nombre:"sebastian sovier",correo:"sebastian.sovier@hotmail.com"});
 });

@@ -17,11 +17,11 @@ const auth = admin.auth();
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
 
-function getOffset(currentPage = 1, listPerPage) {
+const getOffset = (currentPage = 1, listPerPage) => {
   return (currentPage - 1) * [listPerPage];
 }
 
-function encrypt(data) {
+const encrypt = (data) => {
   if (process.env.encrypt == true) {
     const resp = CryptoJS.AES.encrypt(JSON.stringify(data), process.env.secret).toString();
     return resp;
@@ -29,7 +29,7 @@ function encrypt(data) {
     return data;
   }
 }
-function decrypt(data) {
+const decrypt = (data) => {
   console.log(process.env.encrypt)
   if (process.env.encrypt == true) {
     const bytes = CryptoJS.AES.decrypt(data, process.env.secret);
@@ -40,7 +40,7 @@ function decrypt(data) {
   }
 
 }
-function decryptQuery(data) {
+const decryptQuery = (data) => {
   const r1 = new RegExp("/", 'g')
   const r2 = new RegExp("'", 'g')
   const r3 = new RegExp("=", 'g')
@@ -66,7 +66,7 @@ function emptyOrRows(rows) {
   return rows;
 }
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
   const bearerHeader = req.headers['authorization'];
 
   if (bearerHeader) {
@@ -81,7 +81,7 @@ function verifyToken(req, res, next) {
     return res.sendStatus(403);
   }
 }
-function reqToken(req) {
+const reqToken = (req) => {
   const bearerHeader = req.headers['authorization'];
   if (bearerHeader) {
     const bearer = bearerHeader.split(' ');
@@ -95,7 +95,7 @@ function reqToken(req) {
 
 }
 
-function exportXlsx(array) {
+const exportXlsx = (array) => {
   try {
     console.log(array);
     const workbook = new ExcelJS.Workbook();
@@ -130,7 +130,7 @@ function exportXlsx(array) {
 }
 
 
-function logToFile(message) {
+const logToFile = (message) => {
   const today = new Date();
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1; // Months start at 0!
@@ -151,7 +151,7 @@ const logger = {
   error: (message) => logToFile(`[ERROR] ${message}`),
 };
 
-async function createAssessment(token, tokenv2) {
+const createAssessment = async (token, tokenv2) => {
   if (tokenv2) {
     token = tokenv2;
     secretkey = process.env.secretrecaptchav2;
@@ -204,7 +204,7 @@ async function createAssessment(token, tokenv2) {
     }
   }
 }
-async function validateUser(correo, password) {
+const validateUser = async (correo, password) => {
   let token = "";
   const searchUser = await admin.auth().getUserByEmail(correo);
   if (searchUser && searchUser.uid) {
@@ -242,7 +242,7 @@ const parseMiles = (number) => {
     return 0;
   }
 }
-async function createPdf(usuarioPaisesCiudades) {
+const createPdf = async (usuarioPaisesCiudades) => {
 
   const saltoLinea = "\n \n";
   let textoPdf = "";
@@ -256,9 +256,9 @@ async function createPdf(usuarioPaisesCiudades) {
       textPais = `El Pais  ${paisCiudades.nombre_pais} Tiene una cantidad de habitantes N° ${parseMiles(paisCiudades.poblacion)} Su Capital es ${paisCiudades.capital}.`;
       if (paisCiudades.listCiudadesSerialize != null) {
         textPais += "\n Sus ciudades son: ";
-        
+
         const ciudadesPais = JSON.parse(paisCiudades.listCiudadesSerialize);
-        
+
         ciudadesPais.forEach(ciudades => {
           textCiudades += `- La Ciudad ${ciudades.nombre_ciudad} Correspondiente a la región ${ciudades.region} Con una poblacion de ${parseMiles(ciudades.poblacion)} \n`;
         });
@@ -281,7 +281,7 @@ async function createPdf(usuarioPaisesCiudades) {
   doc.end();
   return namePdf;
 }
-function todayDate() {
+const todayDate = () => {
   const today = new Date();
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1;
@@ -294,7 +294,7 @@ function todayDate() {
   return formattedToday;
 }
 
-function sendEmail(data) {
+const sendEmail = (data) => {
 
   data.forEach(async usuarioPaisesCiudades => {
     if (usuarioPaisesCiudades.listPaisesSerialize != null) {
@@ -308,7 +308,7 @@ const sendmail = async (textoDeCorreo, usuarioPaisesCiudades, createPdfName) => 
   await wrapedSendMail(textoDeCorreo, usuarioPaisesCiudades, createPdfName);
 }
 
-async function wrapedSendMail(textoDeCorreo, usuarioPaisesCiudades, createPdfName) {
+const wrapedSendMail = async (textoDeCorreo, usuarioPaisesCiudades, createPdfName) => {
   return new Promise((resolve, reject) => {
     let transporter = nodemailer.createTransport({
       service: 'gmail',

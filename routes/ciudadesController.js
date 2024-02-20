@@ -18,8 +18,8 @@ const instance = axios.create({
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-       return res.sendStatus(403);
-    }else{
+      return res.sendStatus(403);
+    } else {
       const request = helper.decryptQuery(req.query.data);
       instance.post('/Ciudades/CiudadesPais',
         request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
@@ -95,20 +95,20 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Ciudades/ModificarCiudad',
-      request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-    ).then(function (response) {
-      console.log(response.data);
-      if (response && response.data) {
-        return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-      }
-    })
-      .catch(function (error) {
-        console.log(error);
-        helper.logger.error(error);
-        return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
+        }
       })
-      .finally(function () {
-      });
+        .catch(function (error) {
+          console.log(error);
+          helper.logger.error(error);
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+        })
+        .finally(function () {
+        });
     }
   });
 });

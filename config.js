@@ -1,15 +1,14 @@
 const env = process.env;
 
 const config = {
-  db: { 
-    host: env.DB_HOST || 'localhost',
-    user: env.DB_USER || 'root',
-    port:env.port || 3308,
-    password: env.DB_PASSWORD || 'sebsov15',
-    database: env.DB_NAME || 'bdpaises',
+  db: {
+    host: env.DB_HOST ,
+    user: env.DB_USER ,
+    port: env.port,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME
   },
-  listPerPage: env.LIST_PER_PAGE || 10,
-  secret:'a-very-long-radonmly-generated-secret-key-that-cannot-be-guessed'
+  listPerPage: env.LIST_PER_PAGE || 10
 };
 
 
