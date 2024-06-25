@@ -5,7 +5,7 @@ const config = require("./config");
 const fs = require('fs');
 const axios = require('axios').default;
 require('dotenv').config();
-const { RecaptchaEnterpriseServiceClient } = require('@google-cloud/recaptcha-enterprise');
+const {RecaptchaEnterpriseServiceClient} = require('@google-cloud/recaptcha-enterprise');
 const admin = require("firebase-admin");
 const path = require('path');
 const serviceAccount = require("./path/proyecto-angular-12-firebase-adminsdk-3b0cj-ba2223cc30.json");
@@ -13,6 +13,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://proyecto-angular-12-default-rtdb.firebaseio.com"
 });
+
 const auth = admin.auth();
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
@@ -31,9 +32,11 @@ const encrypt = (data) => {
 }
 const decrypt = (data) => {
   console.log(process.env.encrypt)
-  if (process.env.encrypt == true) {
+  if (process.env.encrypt) {
     const bytes = CryptoJS.AES.decrypt(data, process.env.secret);
+    console.log("bytes",bytes)
     const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    console.log("resp",resp)
     return resp;
   } else {
     return data;
@@ -167,14 +170,19 @@ const createAssessment = async (token, tokenv2) => {
     result.data.score = 1;
     return result.data;
   } else {
+    console.log("aqui tamo")
     projectID = process.env.projectID;
     recaptchaAction = process.env.recaptchaAction
     recaptchaKey = process.env.recaptchaKey;
-
-
+  const assessmentName = `projects/${projectID}/assessments`;
+    console.log(projectID)
+    console.log(recaptchaAction)
+    console.log(recaptchaKey)
 
     const client = new RecaptchaEnterpriseServiceClient();
+    console.log(client)
     const projectPath = client.projectPath(projectID);
+    console.log(projectPath)
     const request = ({
       assessment: {
         event: {
@@ -184,9 +192,10 @@ const createAssessment = async (token, tokenv2) => {
       },
       parent: projectPath,
     });
-
+    console.log(request)
+ 
     const [response] = await client.createAssessment(request);
-
+        console.log(response)
     if (!response.tokenProperties.valid) {
       console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
       return { success: false, score: null };

@@ -23,7 +23,7 @@ router.post('/Login', async function (req, res) {
   const request = helper.decrypt(req.body.data);
   console.log(request);
   if (!request.Username && !request.Password) {
-    console.log(req.Username + "  " + req.Password);
+    console.log(request.Username + "  " + request.Password);
     err = "invalid";
   }
   if (err === "invalid") return res.status(500).send("There was a problem validating the user.")
