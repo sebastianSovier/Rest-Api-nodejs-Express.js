@@ -23,7 +23,7 @@ const getOffset = (currentPage = 1, listPerPage) => {
 }
 
 const encrypt = (data) => {
-  if (process.env.encrypt == true) {
+  if (process.env.encrypt) {
     const resp = CryptoJS.AES.encrypt(JSON.stringify(data), process.env.secret).toString();
     return resp;
   } else {

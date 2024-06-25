@@ -47,19 +47,19 @@ router.post('/Login', async function (req, res) {
         if (tokenFirebase) {
           return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: tokenFirebase })) });
         } else {
-          return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+          return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "97", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
         }
       } else {
-        return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
+        return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "96", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
       }
     } else {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "95", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
     }
   })
     .catch(function (error) {
       console.log(error);
       helper.logger.error(error);
-      return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+      return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
     })
     .finally(function () {
     });
