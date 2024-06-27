@@ -9,7 +9,7 @@ const AccountRoutes = require('./routes/accountController.js');
 const path = require("path");
 
 const corsOptions = {
-  origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://localhost:4200'],
+  origin: ['http://18.117.196.27:80','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com:80','ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://ec2-18-117-196-27.us-east-2.compute.amazonaws.com','http://localhost:4200','http://localhost:8080'],
   optionsSuccessStatus: 200 || 204
 }
 

@@ -6,7 +6,8 @@
     "start": "node app.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev": "nodemon -L app.js "
   },
   "private": true,
   "dependencies": {
@@ -25,6 +26,7 @@
     "mysql": "^2.18.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.9",
+    "nodemon": "^3.1.4",
     "pdfkit": "^0.14.0"
   },
   "description": "rest api express.js",
@@ -32,6 +34,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^13.6.3"
+    "cypress": "^13.6.3",
+    "nodemon": "^3.1.4"
   }
 }
