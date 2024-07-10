@@ -50,7 +50,7 @@ const decryptQuery = (data) => {
   const r4 = new RegExp("&", 'g')
   console.log("data: " + data);
   let resp;
-  if (process.env.encrypt == true) {
+  if (process.env.encrypt) {
     const bytes = CryptoJS.AES.decrypt(data.toString(), process.env.secret);
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
     console.log("originalText: " + originalText);
@@ -215,7 +215,10 @@ const createAssessment = async (token, tokenv2) => {
 }
 const validateUser = async (correo, password) => {
   let token = "";
+  try {
   const searchUser = await admin.auth().getUserByEmail(correo);
+  console.log("searchUser")
+  console.log(searchUser);
   if (searchUser && searchUser.uid) {
     const createToken = await auth.createCustomToken(searchUser.uid)
     if (createToken) {
@@ -223,22 +226,21 @@ const validateUser = async (correo, password) => {
     } else {
       console.error('Error al crear el token personalizado:', error);
     }
-  } else {
-    const createUser = await admin.auth().createUser({
-      email: correo,
-      password: password,
-    });
-    if (createUser && createUser.uid) {
-      const createToken = await auth.createCustomToken(userRecord.uid)
-      if (createToken) {
-        token = createToken;
-      } else {
-        console.error('Error al crear el token personalizado:', error);
-      }
-
+  }
+} catch (error) {
+  const createUser = await admin.auth().createUser({
+    email: correo,
+    password: password,
+  });
+  if (createUser && createUser.uid) {
+    const createToken = await auth.createCustomToken(createUser.uid)
+    if (createToken) {
+      token = createToken;
     } else {
       console.error('Error al crear el token personalizado:', error);
     }
+}
+
   }
   console.log("token")
   console.log(token)
