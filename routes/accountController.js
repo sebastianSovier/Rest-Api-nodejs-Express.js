@@ -39,10 +39,13 @@ router.post('/Login', async function (req, res) {
   instance.post('/Account/Login',
     request
   ).then(async function (response) {
-
+    console.log("aquiii")
     console.log(response.data);
     if (response && response.data) {
-      if (response.data.auth == true) {
+      if (response.data.Error === "usuario online") {
+        return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "93", auth: false, mensaje: "Usuario ya tiene session activa" })) });
+      }
+      else if (response.data.auth) {
         const tokenFirebase = await helper.validateUser(response.data.correo, request.Password);
         if (tokenFirebase) {
           return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: tokenFirebase })) });
@@ -52,9 +55,11 @@ router.post('/Login', async function (req, res) {
       } else {
         return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "96", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
       }
-    } else {
+    }
+    else {
       return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "95", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
     }
+
   })
     .catch(function (error) {
       console.log(error);
@@ -64,6 +69,49 @@ router.post('/Login', async function (req, res) {
     .finally(function () {
     });
 });
+router.post('/Logout', async function (req, res) {
+  err = "";
+  console.log(req.body);
+  const request = helper.decrypt(req.body.data);
+  console.log(request);
+  if (!request.usuario) {
+    console.log(request.usuario);
+    err = "invalid";
+  }
+  if (err === "invalid") return res.status(500).send("There was a problem validating the user.")
+  const actualizarSesionReq = { usuario: request.usuario, user_activo: 'INACTIVO' }
+  instance.post('/Session/ActualizarSession',
+    actualizarSesionReq
+  ).then(async function (response) {
+
+    console.log(response.data);
+    if (response && response.data) {
+      if (response.data.auth) {
+        const tokenFirebase = await helper.validateUser(response.data.correo, request.Password);
+        if (tokenFirebase) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: tokenFirebase })) });
+        } else {
+          return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "97", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+        }
+      } else {
+        return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "96", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
+      }
+    } else if (response && response.Error && response.Error === "usuario online") {
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "93", auth: false, mensaje: "Usuario ya tiene session activa" })) });
+    } else {
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "95", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+    }
+
+  })
+    .catch(function (error) {
+      console.log(error);
+      helper.logger.error(error);
+      return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+    })
+    .finally(function () {
+    });
+});
+
 
 router.post('/IngresarUsuario', async function (req, res, next) {
   console.log(helper.decrypt(req.body.data))

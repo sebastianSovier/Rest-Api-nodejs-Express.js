@@ -36,6 +36,20 @@ cron.schedule('* 10 * * *', function (now) {
 
 });
 
+cron.schedule('*/5 * * * *', function (now) {
+  instance.post('/Session/CierreSessionesInactivas'
+  ).then(function (response) {
+    //console.log(response);
+  })
+    .catch(function (error) {
+      console.log(error);
+      helper.logger.error(error);
+    })
+    .finally(function () {
+    });
+
+});
+
 router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
