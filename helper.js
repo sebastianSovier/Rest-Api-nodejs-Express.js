@@ -144,7 +144,7 @@ const logToFile = (message) => {
 
   const formattedToday = dd + '_' + mm + '_' + yyyy;
 
-  const logStream = fs.createWriteStream('Logs' + formattedToday + '.txt', { flags: 'a' });
+  const logStream = fs.createWriteStream('Logs/Logs' + formattedToday + '.txt', { flags: 'a' });
   logStream.write(`${message}\n`);
   logStream.end();
 }
