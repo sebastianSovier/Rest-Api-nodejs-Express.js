@@ -64,7 +64,7 @@ router.post('/Login', async function (req, res) {
     .catch(function (error) {
       console.log(error);
       helper.logger.error(error);
-      return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
     })
     .finally(function () {
     });
@@ -81,32 +81,15 @@ router.post('/Logout', async function (req, res) {
   if (err === "invalid") return res.status(500).send("There was a problem validating the user.")
   const actualizarSesionReq = { usuario: request.usuario, user_activo: 'INACTIVO' }
   instance.post('/Session/ActualizarSession',
-    actualizarSesionReq
+    actualizarSesionReq, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
   ).then(async function (response) {
-
-    console.log(response.data);
-    if (response && response.data) {
-      if (response.data.auth) {
-        const tokenFirebase = await helper.validateUser(response.data.correo, request.Password);
-        if (tokenFirebase) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: response.data.auth, access_Token: response.data.access_Token, tokenFirebase: tokenFirebase })) });
-        } else {
-          return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "97", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
-        }
-      } else {
-        return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "96", auth: false, mensaje: "Usuario o contrasena incorrecto" })) });
-      }
-    } else if (response && response.Error && response.Error === "usuario online") {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "93", auth: false, mensaje: "Usuario ya tiene session activa" })) });
-    } else {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ Error: "95", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
-    }
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: false, })) });
 
   })
     .catch(function (error) {
       console.log(error);
       helper.logger.error(error);
-      return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "error al cerrar sesion" })) });
     })
     .finally(function () {
     });
@@ -132,7 +115,7 @@ router.post('/IngresarUsuario', async function (req, res, next) {
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "error al crear usuario" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "error al crear usuario" } })) });
         })
         .finally(function () {
         });

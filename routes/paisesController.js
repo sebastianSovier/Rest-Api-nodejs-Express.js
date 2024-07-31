@@ -69,7 +69,7 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
@@ -93,7 +93,7 @@ router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, 
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
@@ -125,7 +125,7 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
       }).catch(function (error) {
         console.log(error);
         helper.logger.error(error);
-        return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+        return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
 
       }).finally(function () {
       });
@@ -150,7 +150,7 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
@@ -174,7 +174,7 @@ router.post('/ImportarPais', helper.verifyToken, async function (req, res, next)
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
@@ -201,7 +201,7 @@ router.put('/ModificarPais', helper.verifyToken, async function (req, res, next)
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
@@ -226,7 +226,7 @@ router.delete('/EliminarPais', helper.verifyToken, async function (req, res, nex
         .catch(function (error) {
           console.log(error);
           helper.logger.error(error);
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
         })
         .finally(function () {
         });
