@@ -18,7 +18,7 @@ const instance = axios.create({
 router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decryptQuery(req.query.data);
       instance.post('/Ciudades/CiudadesPais',
@@ -42,7 +42,7 @@ router.get('/CiudadesPais', helper.verifyToken, async function (req, res, next) 
 router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Ciudades/IngresarCiudad',
@@ -66,7 +66,7 @@ router.post('/IngresarCiudad', helper.verifyToken, async function (req, res, nex
 router.post('/ImportarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Ciudades/GetDataFromExcel',
@@ -91,7 +91,7 @@ router.post('/ImportarCiudad', helper.verifyToken, async function (req, res, nex
 router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Ciudades/ModificarCiudad',
@@ -115,7 +115,7 @@ router.put('/ModificarCiudad', helper.verifyToken, async function (req, res, nex
 router.delete('/EliminarCiudad', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decryptQuery(req.query.data);
       instance.post('/Ciudades/EliminarCiudad',

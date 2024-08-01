@@ -20,7 +20,7 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
       console.log(err)
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       console.log(authdata);
       const request = helper.decryptQuery(decodeURIComponent(req.query.data));
@@ -45,7 +45,7 @@ router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next
 router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Countries/ObtenerPaisesPorFechas',
@@ -70,7 +70,7 @@ router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, 
 router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       console.log(authdata);
       const request = helper.decryptQuery(req.query.data);
@@ -102,7 +102,7 @@ router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next
 router.post('/IngresarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Countries/IngresarPais',
@@ -126,7 +126,7 @@ router.post('/IngresarPais', helper.verifyToken, async function (req, res, next)
 router.post('/ImportarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decrypt(req.body.data);
       instance.post('/Countries/GetDataFromExcel',
@@ -152,7 +152,7 @@ router.post('/ImportarPais', helper.verifyToken, async function (req, res, next)
 router.put('/ModificarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       console.log("modificar pais: " + JSON.stringify(req.body));
       const request = helper.decrypt(req.body.data);
@@ -178,7 +178,7 @@ router.put('/ModificarPais', helper.verifyToken, async function (req, res, next)
 router.delete('/EliminarPais', helper.verifyToken, async function (req, res, next) {
   jwt.verify(req.token, process.env.secret, (err, authdata) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
     } else {
       const request = helper.decryptQuery(req.query.data);
       instance.post('/Countries/EliminarPais',
