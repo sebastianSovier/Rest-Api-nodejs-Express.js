@@ -1,7 +1,6 @@
 
 const ExcelJS = require('exceljs');
 const CryptoJS = require("crypto-js");
-const config = require("./config");
 const fs = require('fs');
 const axios = require('axios').default;
 require('dotenv').config();
@@ -34,7 +33,6 @@ const decrypt = (data) => {
   console.log(process.env.encrypt)
   if (process.env.encrypt) {
     const bytes = CryptoJS.AES.decrypt(data, process.env.secret);
-    console.log("bytes",bytes)
     const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     console.log("resp",resp)
     return resp;

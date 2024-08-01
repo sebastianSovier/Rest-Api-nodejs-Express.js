@@ -6,6 +6,7 @@ const port = process.env.PORT || 3000;
 const PaisesRoutes = require('./routes/paisesController.js');
 const CiudadesRoutes = require('./routes/ciudadesController.js');
 const AccountRoutes = require('./routes/accountController.js');
+
 const path = require("path");
 
 const corsOptions = {
@@ -21,6 +22,7 @@ app.use(bodyParser.json())
 app.use('/Account', AccountRoutes);
 app.use('/Countries', PaisesRoutes);
 app.use('/Ciudades', CiudadesRoutes);
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Error interno del servidor');
@@ -28,3 +30,4 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 });
+require('./routes/tareasController.js');

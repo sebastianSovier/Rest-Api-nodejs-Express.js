@@ -64,7 +64,7 @@ router.post('/Login', async function (req, res) {
     .catch(function (error) {
       console.log(error);
       helper.logger.error(error);
-      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Usuario o contraseña incorrecto" })) });
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "Error al validar usuario" })) });
     })
     .finally(function () {
     });
