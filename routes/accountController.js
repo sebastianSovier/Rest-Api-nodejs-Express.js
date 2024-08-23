@@ -94,22 +94,27 @@ router.post('/Logout', async function (req, res) {
     .finally(function () {
     });
 });
-
-
 router.post('/IngresarUsuario', async function (req, res, next) {
   console.log(helper.decrypt(req.body.data))
   const request = helper.decrypt(req.body.data);
+  const validToken = await helper.createAssessment(request.token, request.tokenv2);
+  if (!validToken) {
+    return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: 'Internal server error', tokenRecaptcha: request.token })) });
+  }
+  if ((validToken && validToken.score < 0.5 && validToken.success === false) || (validToken && validToken.success === false)) {
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "3", auth: false, mensaje: "recaptcha verification failed", score: validToken.score })) })
+  }
   bcrypt.genSalt(saltRounds, function (err, salt) {
     bcrypt.hash(request.contrasena, salt, function (err, hash) {
       request.contrasena = hash;
       instance.post('/Account/IngresarUsuario', request
       ).then(function (response) {
         console.log(response.data);
-        if (response && response.data) {
+        if (response && response.data && response.data.auth) {
           return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: "ok" })) });
         } else {
           console.log("aqui2");
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "error al crear usuario" } })) });
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "usuario ya existe" } })) });
         }
       })
         .catch(function (error) {
@@ -123,4 +128,96 @@ router.post('/IngresarUsuario', async function (req, res, next) {
   });
 });
 
+router.post('/SolicitarCodigo', async function (req, res, next) {
+  console.log(helper.decrypt(req.body.data))
+  const request = helper.decrypt(req.body.data);
+  const validToken = await helper.createAssessment(request.token, request.tokenv2);
+  if (!validToken) {
+    return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: 'Internal server error', tokenRecaptcha: request.token })) });
+  }
+  if ((validToken && validToken.score < 0.5 && validToken.success === false) || (validToken && validToken.success === false)) {
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "3", auth: false, mensaje: "recaptcha verification failed", score: validToken.score })) })
+  }
+  const requestObject = { usuario: request.Username };
+  instance.post('/Account/CodigoRecuperacion',
+    requestObject
+  ).then(async function (response) {
+    console.log(response.data);
+    if(response.data.cod_recover_password && response.data.correo){
+      await helper.sendmailCode(response.data.correo,response.data.cod_recover_password);
+    }
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: true })) });
+
+  })
+    .catch(function (error) {
+      console.log(error);
+      helper.logger.error(error);
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "error al cerrar sesion" })) });
+    })
+    .finally(function () {
+    });
+});
+router.post('/ValidaCodigo', async function (req, res, next) {
+  console.log(helper.decrypt(req.body.data))
+  const request = helper.decrypt(req.body.data);
+  const validToken = await helper.createAssessment(request.token, request.tokenv2);
+  if (!validToken) {
+    return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: 'Internal server error', tokenRecaptcha: request.token })) });
+  }
+  if ((validToken && validToken.score < 0.5 && validToken.success === false) || (validToken && validToken.success === false)) {
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "3", auth: false, mensaje: "recaptcha verification failed", score: validToken.score })) })
+  }
+  const requestObject = { usuario: request.Username, cod_recover_password: request.Codigo }
+  instance.post('/Account/ValidaCodigo',
+    requestObject
+  ).then(async function (response) {
+    if(response.data.auth){
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ auth: true })) });
+    }else{
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "error al cerrar sesion" })) });
+    }
+
+  })
+    .catch(function (error) {
+      console.log(error);
+      helper.logger.error(error);
+      return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "94", auth: false, mensaje: "error al cerrar sesion" })) });
+    })
+    .finally(function () {
+    });
+});
+router.post('/CambiarPassword', async function (req, res, next) {
+  console.log(helper.decrypt(req.body.data))
+  const request = helper.decrypt(req.body.data);
+  const validToken = await helper.createAssessment(request.token, request.tokenv2);
+  if (!validToken) {
+    return res.status(500).send({ data: helper.encrypt(JSON.stringify({ Error: "98", auth: false, mensaje: 'Internal server error', tokenRecaptcha: request.token })) });
+  }
+  if ((validToken && validToken.score < 0.5 && validToken.success === false) || (validToken && validToken.success === false)) {
+    return res.status(200).send({ data: helper.encrypt(JSON.stringify({ Error: "3", auth: false, mensaje: "recaptcha verification failed", score: validToken.score })) })
+  }
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(request.Password, salt, function (err, hash) {
+      request.Password = hash;
+      const requestObject = { usuario: request.Username, password: request.Password }
+      instance.post('/Account/CambioPassword', requestObject
+      ).then(function (response) {
+        console.log(response.data);
+        if (response && response.data && response.data.auth) {
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: "ok" })) });
+        } else {
+          console.log("aqui2");
+          return res.status(200).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "error al cambiar contraseña" } })) });
+        }
+      })
+        .catch(function (error) {
+          console.log(error);
+          helper.logger.error(error);
+          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "error al cambiar contraseña" } })) });
+        })
+        .finally(function () {
+        });
+    });
+  });
+});
 module.exports = router;

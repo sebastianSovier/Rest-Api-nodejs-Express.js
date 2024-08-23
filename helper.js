@@ -170,6 +170,10 @@ const createAssessment = async (token, tokenv2) => {
   } else {
     projectID = process.env.projectID;
     recaptchaAction = process.env.recaptchaAction
+    recaptchaAction2 = process.env.recaptchaAction2
+    recaptchaAction3 = process.env.recaptchaAction3
+    recaptchaAction4 = process.env.recaptchaAction4
+    recaptchaAction5 = process.env.recaptchaAction5
     recaptchaKey = process.env.recaptchaKey;
 
     const client = new RecaptchaEnterpriseServiceClient();
@@ -192,7 +196,7 @@ const createAssessment = async (token, tokenv2) => {
       console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
       return { success: false, score: null };
     }
-    if (response.tokenProperties.action === recaptchaAction) {
+    if (response.tokenProperties.action == recaptchaAction || response.tokenProperties.action == recaptchaAction2 || response.tokenProperties.action == recaptchaAction3 ||response.tokenProperties.action == recaptchaAction4 || response.tokenProperties.action == recaptchaAction5) {
       console.log(`The reCAPTCHA score is: ${response.riskAnalysis.score}`);
       response.riskAnalysis.reasons.forEach((reason) => {
         console.log(reason);
@@ -342,6 +346,36 @@ const wrapedSendMail = async (textoDeCorreo, usuarioPaisesCiudades, createPdfNam
   });
 }
 
+const sendEmailCode =  async (correo,codigo) => {
+   return new Promise((resolve, reject) => {
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.user,
+      pass: process.env.pass
+    }
+  });
+  const mailOptions = {
+    from: "app@app.cl",
+    to: correo,
+    subject: 'Codigo recuperacion',
+    text: '',
+    html: codigo,
+
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      resolve(false);
+    }
+    else {
+      resolve(true);
+    }
+  });
+});
+}
+const sendmailCode = async (correo, codigo) => {
+  await sendEmailCode(correo, codigo);
+}
 
 
 module.exports = {
@@ -356,5 +390,6 @@ module.exports = {
   logger,
   createAssessment,
   validateUser,
-  sendEmail
+  sendEmail,
+  sendmailCode
 }
