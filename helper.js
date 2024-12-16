@@ -1,5 +1,6 @@
 
 const ExcelJS = require('exceljs');
+const Crypto = require("crypto");
 const CryptoJS = require("crypto-js");
 const fs = require('fs');
 const axios = require('axios').default;
@@ -23,8 +24,19 @@ const getOffset = (currentPage = 1, listPerPage) => {
 
 const encrypt = (data) => {
   if (process.env.encrypt) {
-    const resp = CryptoJS.AES.encrypt(JSON.stringify(data), process.env.secret).toString();
-    return resp;
+    const salt = Crypto.randomBytes(16); // Salt aleatorio
+  const iv = Crypto.randomBytes(16);   // IV aleatorio
+  const key = Crypto.pbkdf2Sync(process.env.secret, salt, 1000, 32, 'sha256'); // Derivar clave con PBKDF2
+
+  const cipher = Crypto.createCipheriv('aes-256-cbc', key, iv);
+  let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+
+  return {
+    iv: iv.toString('hex'),
+    salt: salt.toString('hex'),
+    ciphertext: encrypted,
+  };
   } else {
     return data;
   }
@@ -32,10 +44,23 @@ const encrypt = (data) => {
 const decrypt = (data) => {
   console.log(process.env.encrypt)
   if (process.env.encrypt) {
-    const bytes = CryptoJS.AES.decrypt(data, process.env.secret);
-    const resp = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    console.log("resp", resp)
-    return resp;
+    try {
+      const iv = Buffer.from(data.iv, 'hex'); // IV en Buffer
+      const salt = Buffer.from(data.salt, 'hex'); // Salt en Buffer
+      const ciphertext = Buffer.from(data.ciphertext, 'hex'); // Ciphertext en Buffer
+    
+      const key = Crypto.pbkdf2Sync(process.env.secret, salt, 1000, 32, 'sha256'); // Derivar clave con PBKDF2
+    
+      const decipher = Crypto.createDecipheriv('aes-256-cbc', key, iv);
+      let decrypted = decipher.update(ciphertext, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      console.log("decrypted")
+      console.log(decrypted)
+      return JSON.parse(decrypted).body;
+    } catch (err) {
+      console.error('Error al desencriptar:', err.message);
+      throw new Error('Desencriptación fallida');
+    }
   } else {
     return data;
   }
@@ -196,7 +221,7 @@ const createAssessment = async (token, tokenv2) => {
       console.log(`The CreateAssessment call failed because the token was: ${response.tokenProperties.invalidReason}`);
       return { success: false, score: null };
     }
-    if (response.tokenProperties.action == recaptchaAction || response.tokenProperties.action == recaptchaAction2 || response.tokenProperties.action == recaptchaAction3 ||response.tokenProperties.action == recaptchaAction4 || response.tokenProperties.action == recaptchaAction5) {
+    if (response.tokenProperties.action == recaptchaAction || response.tokenProperties.action == recaptchaAction2 || response.tokenProperties.action == recaptchaAction3 || response.tokenProperties.action == recaptchaAction4 || response.tokenProperties.action == recaptchaAction5) {
       console.log(`The reCAPTCHA score is: ${response.riskAnalysis.score}`);
       response.riskAnalysis.reasons.forEach((reason) => {
         console.log(reason);
@@ -346,32 +371,32 @@ const wrapedSendMail = async (textoDeCorreo, usuarioPaisesCiudades, createPdfNam
   });
 }
 
-const sendEmailCode =  async (correo,codigo) => {
-   return new Promise((resolve, reject) => {
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.user,
-      pass: process.env.pass
-    }
-  });
-  const mailOptions = {
-    from: "app@app.cl",
-    to: correo,
-    subject: 'Codigo recuperacion',
-    text: '',
-    html: codigo,
+const sendEmailCode = async (correo, codigo) => {
+  return new Promise((resolve, reject) => {
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.user,
+        pass: process.env.pass
+      }
+    });
+    const mailOptions = {
+      from: "app@app.cl",
+      to: correo,
+      subject: 'Codigo recuperacion',
+      text: '',
+      html: codigo,
 
-  };
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      resolve(false);
-    }
-    else {
-      resolve(true);
-    }
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        resolve(false);
+      }
+      else {
+        resolve(true);
+      }
+    });
   });
-});
 }
 const sendmailCode = async (correo, codigo) => {
   await sendEmailCode(correo, codigo);
