@@ -87,7 +87,7 @@ app.use((err, req, res, next) => {
 // Start the Server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-  if(process.env.production){
+  if(process.env.production === true){
     console.log = function(){}
     console.warn = function(){}
     console.error = function(){}
