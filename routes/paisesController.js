@@ -1,203 +1,106 @@
 const express = require('express');
 const router = express.Router();
-const helper = require('../helper');
+const helper = require('../helper.js');
 const jwt = require('jsonwebtoken');
 const axios = require('axios').default;
 const https = require('https');
 require('dotenv').config();
-const instance = axios.create({
+
+const axiosInstance = axios.create({
   baseURL: process.env.URLCORELOCAL,
-  httpsAgent: new https.Agent({
-    rejectUnauthorized: false
-  }),
+  httpsAgent: new https.Agent({ rejectUnauthorized: false }),
   responseType: "json",
   maxContentLength: Infinity,
   maxBodyLength: Infinity,
-  headers: { "Content-Type": "application/json" }
+  headers: { "Content-Type": "application/json" },
 });
 
-router.get('/TodosLosPaises', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
+// Middleware para verificar token
+const verifyTokenMiddleware = (req, res, next) => {
+  jwt.verify(req.token, process.env.secret, (err, authData) => {
     if (err) {
-      console.log(err)
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      console.log(authdata);
-      const request = helper.decryptQuery(decodeURIComponent(req.query.data));
-      instance.post('/Countries/TodosLosPaises',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
-    }
-  });
-});
-router.post('/ObtenerPaisesPorFechas', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      const request = helper.decrypt(req.body.data);
-      instance.post('/Countries/ObtenerPaisesPorFechas',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
-    }
-  });
-
-});
-router.get('/GetExcelPaises', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      console.log(authdata);
-      const request = helper.decryptQuery(req.query.data);
-
-      instance.post('/Countries/GetExcelPaises',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          const outputData = response.data.map(Object.values);
-          const workbook = helper.exportXlsx(outputData);
-          workbook?.xlsx.writeBuffer().then(function (result) {
-            console.log(result);
-            const string64 = result.toString('base64');
-            return res.status(200).send({ data: helper.encrypt(JSON.stringify(string64)) });
-          }, error => { console.log("workbook?.xlsx"); console.log(error) });
-        }
-      }).catch(function (error) {
-        console.log(error);
-        helper.logger.error(error);
-        return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-
-      }).finally(function () {
+      return res.status(403).json({
+        data: helper.encrypt(JSON.stringify({ datos: { Error: "Token no válido" } })),
       });
     }
+    req.authData = authData;
+    next();
   });
+};
 
-});
-router.post('/IngresarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      const request = helper.decrypt(req.body.data);
-      instance.post('/Countries/IngresarPais',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
+// Función para manejar solicitudes a Axios
+const handleAxiosRequest = async (endpoint, data, req, res) => {
+  try {
+    const response = await axiosInstance.post(endpoint, data, {
+      headers: { Authorization: `Bearer ${helper.reqToken(req)}` },
+    });
+    if (response && response.data) {
+      return res.status(200).json({
+        data: helper.encrypt(JSON.stringify(response.data)),
+      });
     }
-  });
-});
-router.post('/ImportarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      const request = helper.decrypt(req.body.data);
-      instance.post('/Countries/GetDataFromExcel',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
-    }
-  });
+  } catch (error) {
+    console.error(error);
+    helper.logger.error(error);
+    return res.status(500).json({
+      data: helper.encrypt(JSON.stringify({ datos: { Error: "Hubo un problema" } })),
+    });
+  }
+};
+
+// Rutas
+router.get('/TodosLosPaises', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decryptQuery(decodeURIComponent(req.query.data));
+  await handleAxiosRequest('/Countries/TodosLosPaises', request, req, res);
 });
 
-
-router.put('/ModificarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      console.log("modificar pais: " + JSON.stringify(req.body));
-      const request = helper.decrypt(req.body.data);
-      instance.post('/Countries/ModificarPais',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
-    }
-  });
+router.post('/ObtenerPaisesPorFechas', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decrypt(req.body.data);
+  await handleAxiosRequest('/Countries/ObtenerPaisesPorFechas', request, req, res);
 });
 
-router.delete('/EliminarPais', helper.verifyToken, async function (req, res, next) {
-  jwt.verify(req.token, process.env.secret, (err, authdata) => {
-    if (err) {
-      return res.status(403).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "token no valido" } })) });
-    } else {
-      const request = helper.decryptQuery(req.query.data);
-      instance.post('/Countries/EliminarPais',
-        request, { headers: { "Authorization": "Bearer " + helper.reqToken(req) } }
-      ).then(function (response) {
-        console.log(response.data);
-        if (response && response.data) {
-          return res.status(200).send({ data: helper.encrypt(JSON.stringify(response.data)) });
-        }
-      })
-        .catch(function (error) {
-          console.log(error);
-          helper.logger.error(error);
-          return res.status(500).send({ data: helper.encrypt(JSON.stringify({ datos: { Error: "hubo un problema" } })) });
-        })
-        .finally(function () {
-        });
+router.get('/GetExcelPaises', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decryptQuery(req.query.data);
+  try {
+    const response = await axiosInstance.post('/Countries/GetExcelPaises', request, {
+      headers: { Authorization: `Bearer ${helper.reqToken(req)}` },
+    });
+    if (response && response.data) {
+      const outputData = response.data.map(Object.values);
+      const workbook = helper.exportXlsx(outputData);
+      const buffer = await workbook?.xlsx.writeBuffer();
+      const string64 = buffer.toString('base64');
+      return res.status(200).json({
+        data: helper.encrypt(JSON.stringify(string64)),
+      });
     }
-  });
+  } catch (error) {
+    console.error(error);
+    helper.logger.error(error);
+    return res.status(500).json({
+      data: helper.encrypt(JSON.stringify({ datos: { Error: "Hubo un problema" } })),
+    });
+  }
+});
+
+router.post('/IngresarPais', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decrypt(req.body.data);
+  await handleAxiosRequest('/Countries/IngresarPais', request, req, res);
+});
+
+router.post('/ImportarPais', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decrypt(req.body.data);
+  await handleAxiosRequest('/Countries/GetDataFromExcel', request, req, res);
+});
+
+router.put('/ModificarPais', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decrypt(req.body.data);
+  await handleAxiosRequest('/Countries/ModificarPais', request, req, res);
+});
+
+router.delete('/EliminarPais', helper.verifyToken, verifyTokenMiddleware, async (req, res) => {
+  const request = helper.decryptQuery(req.query.data);
+  await handleAxiosRequest('/Countries/EliminarPais', request, req, res);
 });
 
 module.exports = router;
